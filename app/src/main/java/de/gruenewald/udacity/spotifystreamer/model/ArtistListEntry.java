@@ -23,16 +23,36 @@
 
 package de.gruenewald.udacity.spotifystreamer.model;
 
-public class ArtistListEntry {
+import android.os.Parcel;
+import android.os.Parcelable;
+
+public class ArtistListEntry implements Parcelable {
     private String mArtistName;
     private String mCoverUrl;
-
     private final String mArtistId;
+
+    public static final Creator<ArtistListEntry> CREATOR = new Creator<ArtistListEntry>() {
+        @Override
+        public ArtistListEntry createFromParcel(Parcel source) {
+            return new ArtistListEntry(source);
+        }
+
+        @Override
+        public ArtistListEntry[] newArray(int size) {
+            return new ArtistListEntry[size];
+        }
+    };
 
     public ArtistListEntry(String pArtistId) {
         mArtistName = null;
         mCoverUrl = null;
         mArtistId = pArtistId;
+    }
+
+    private ArtistListEntry(Parcel in) {
+        mArtistId = in.readString();
+        mArtistName = in.readString();
+        mCoverUrl = in.readString();
     }
 
     public String getArtistName() {
@@ -62,5 +82,17 @@ public class ArtistListEntry {
                 ", mCoverUrl='" + mCoverUrl + '\'' +
                 ", mArtistId='" + mArtistId + '\'' +
                 '}';
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(mArtistId);
+        dest.writeString(mArtistName);
+        dest.writeString(mCoverUrl);
     }
 }

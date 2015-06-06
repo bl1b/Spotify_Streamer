@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ * <p/>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ * <p/>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -39,7 +39,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import de.gruenewald.udacity.spotifystreamer.model.ArtistAdapter;
@@ -57,20 +56,28 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
 
     static final String LOG_TAG = ArtistSearchActivity.class.getSimpleName();
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
+    public static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
     SearchView mSearchView;
     ListView mListView;
+    ArrayList<ArtistListEntry> mArtistListEntries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_artistsearch);
 
+        setContentView(R.layout.activity_artistsearch);
         // setup the listview
         // TODO: maybe setup the listview with some dummy-data to prevent a blank screen
         mListView = (ListView) findViewById(R.id.artist_search_listview);
-    }
 
+        // fetch existing artistlist entries from the saved instance state to prevent
+        // and empty list after rotating the device
+        if (savedInstanceState != null) {
+            mArtistListEntries = savedInstanceState.getParcelableArrayList("existing_entries");
+            repopulateListView(mArtistListEntries);
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -152,7 +159,7 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
         final ArtistSearchActivity ref = this;
 
         // translate the artistlist from REST-Request into ArtistListEntry objects.
-        final List<ArtistListEntry> myList = new ArrayList<ArtistListEntry>();
+        final ArrayList<ArtistListEntry> myList = new ArrayList<ArtistListEntry>();
         for (Artist myArtist : t.artists.items) {
             ArtistListEntry myNewEntry = new ArtistListEntry(myArtist.id);
             myNewEntry.setArtistName(myArtist.name);
@@ -194,9 +201,17 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
         });
     }
 
-    private void repopulateListView(List<ArtistListEntry> pArtistListEntries) {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        // save the existing list so that it can be restored
+        outState.putParcelableArrayList(KEY_ARTLIST_ENTRIES, mArtistListEntries);
+        super.onSaveInstanceState(outState);
+    }
+
+    private void repopulateListView(ArrayList<ArtistListEntry> pArtistListEntries) {
         ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_search_listentry, R.id.artist_search_listentry_text, pArtistListEntries);
         if (mListView != null) {
+            mArtistListEntries = pArtistListEntries;
             mListView.setAdapter(myAdapter);
         }
     }
