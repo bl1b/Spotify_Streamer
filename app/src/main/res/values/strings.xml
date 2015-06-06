@@ -2,4 +2,9 @@
     <string name="app_name">Spotify Streamer</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="artist_search_actionbar_search">Search artist</string>
+    <string name="search_label">Search Label</string>
+    <string name="search_hint">Search Hint</string>
+    <string name="artist_search_error_noresults">Error searching artist. Maybe try another name.</string>
+    <string name="artist_search_error_default">An error requesting the artist occured. Please try again later.</string>
 </resources>
