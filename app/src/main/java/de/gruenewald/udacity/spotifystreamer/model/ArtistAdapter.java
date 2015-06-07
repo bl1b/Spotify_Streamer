@@ -54,8 +54,8 @@ public class ArtistAdapter extends ArrayAdapter<ArtistListEntry> {
             myView = myLayoutInflater.inflate(R.layout.view_artist_listentry, parent, false);
         }
 
-        TextView myTextView = (TextView) myView.findViewById(R.id.artist_search_listentry_text);
-        ImageView myImageView = (ImageView) myView.findViewById(R.id.artist_search_listentry_icon);
+        TextView myTextView = (TextView) myView.findViewById(R.id.artist_listentry_text);
+        ImageView myImageView = (ImageView) myView.findViewById(R.id.artist_listentry_icon);
 
         if (myImageView != null && getItem(position).getCoverUrl() != null) {
             Picasso.with(getContext()).load(getItem(position).getCoverUrl()).into(myImageView);
