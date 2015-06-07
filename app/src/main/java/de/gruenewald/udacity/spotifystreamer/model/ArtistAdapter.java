@@ -51,7 +51,7 @@ public class ArtistAdapter extends ArrayAdapter<ArtistListEntry> {
 
         if (myView == null) {
             LayoutInflater myLayoutInflater = LayoutInflater.from(getContext());
-            myView = myLayoutInflater.inflate(R.layout.view_artist_search_listentry, parent, false);
+            myView = myLayoutInflater.inflate(R.layout.view_artist_listentry, parent, false);
         }
 
         TextView myTextView = (TextView) myView.findViewById(R.id.artist_search_listentry_text);

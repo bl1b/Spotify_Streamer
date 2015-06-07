@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p/>
+ * <p>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p/>
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -34,6 +34,8 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -48,14 +50,15 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import kaaes.spotify.webapi.android.models.Tracks;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class ArtistSearchActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, Callback<ArtistsPager> {
+public class ArtistActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, AdapterView.OnItemClickListener {
 
-    static final String LOG_TAG = ArtistSearchActivity.class.getSimpleName();
+    static final String LOG_TAG = ArtistActivity.class.getSimpleName();
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
     public static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
@@ -63,22 +66,23 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
     ListView mListView;
     ArrayList<ArtistListEntry> mArtistListEntries;
 
+    final SpotifyApi mSpotifyApi = new SpotifyApi();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_artistsearch);
+        setContentView(R.layout.activity_artist);
         // setup the listview
-        // TODO: maybe setup the listview with some dummy-data to prevent a blank screen
-        mListView = (ListView) findViewById(R.id.artist_search_listview);
-
+        mListView = (ListView) findViewById(R.id.artist_listview);
+        mListView.setOnItemClickListener(this);
         // fetch existing artistlist entries from the saved instance state to prevent
         // and empty list after rotating the device
         if (savedInstanceState != null) {
             mArtistListEntries = savedInstanceState.getParcelableArrayList("existing_entries");
             repopulateListView(mArtistListEntries);
         } else {
-            String[] dummyEntries = new String[] {
+            String[] dummyEntries = new String[]{
                     "Dummy 1",
                     "Dummy 2",
                     "Dummy 3",
@@ -90,14 +94,14 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
                     "Dummy 9",
                     "Dummy 10"
             };
-            mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.view_artist_search_listentry, R.id.artist_search_listentry_text, dummyEntries));
+            mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.view_artist_listentry, R.id.artist_search_listentry_text, dummyEntries));
         }
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.artistsearch, menu);
+        getMenuInflater().inflate(R.menu.main, menu);
 
         // setup the searchview-item and set the querylistener to be this activity
         MenuItem searchItem = menu.findItem(R.id.artist_search_actionbar_search);
@@ -125,6 +129,38 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
     }
 
     /**
+     * Callback method when an item in {@link ListView} is clicked.
+     *
+     * @param parent   The parenting {@link AdapterView}. In this case the artists' Listview.
+     * @param view     The view representation of the clicked list cell.
+     * @param position The position inside the list (0-indexed).
+     * @param id       The id of the list cell.
+     */
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+        if (parent.getItemAtPosition(position) != null && parent.getItemAtPosition(position) instanceof ArtistListEntry) {
+            ArtistListEntry myEntry = (ArtistListEntry) parent.getItemAtPosition(position);
+            Map<String, Object> myParameterMap = new HashMap<String, Object>();
+            // TODO: make configurable over settings
+            myParameterMap.put("country", "US");
+            mSpotifyApi.getService().getArtistTopTrack(myEntry.getArtistId(), myParameterMap, new Callback<Tracks>() {
+                @Override
+                public void success(Tracks t, Response response) {
+
+                }
+
+                @Override
+                public void failure(RetrofitError error) {
+
+                }
+            });
+        } else if (parent.getItemAtPosition(position) != null) {
+            Log.v(LOG_TAG, "Entry at position " + position + ": " + parent.getItemAtPosition(position).toString());
+        }
+    }
+
+    /**
      * This callback method is used by the {@link #mSearchView} and called when
      * the search-query is submitted (by enter button)
      *
@@ -133,12 +169,69 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
      */
     @Override
     public boolean onQueryTextSubmit(final String query) {
-        final SpotifyApi mySpotifyApi = new SpotifyApi();
-        final SpotifyService mySpotifyService = mySpotifyApi.getService();
+
+        final SpotifyService mySpotifyService = mSpotifyApi.getService();
         Map<String, Object> queryMap = new HashMap<String, Object>();
         // TODO: Read the limit from the settings
         queryMap.put("limit", 20);
-        mySpotifyService.searchArtists(query, queryMap, this);
+
+        final ArtistActivity ref = this;
+        mySpotifyService.searchArtists(query, queryMap, new Callback<ArtistsPager>() {
+            /**
+             * Callback Method used be retrofit when the REST-Request completes.
+             *
+             * @param t        The result-object containing the artists information
+             * @param response The raw response object.
+             */
+            @Override
+            public void success(final ArtistsPager t, final Response response) {
+                // translate the artistlist from REST-Request into ArtistListEntry objects.
+                final ArrayList<ArtistListEntry> myList = new ArrayList<ArtistListEntry>();
+                for (Artist myArtist : t.artists.items) {
+                    ArtistListEntry myNewEntry = new ArtistListEntry(myArtist.id);
+                    myNewEntry.setArtistName(myArtist.name);
+                    // seems the last image in the list is the smallest; so pick that.
+                    if (myArtist.images.size() > 0) {
+                        myNewEntry.setCoverUrl(myArtist.images.get(myArtist.images.size() - 1).url);
+                    }
+                    myList.add(myNewEntry);
+                }
+
+                // Seems when this method is called by retrofit we are not
+                // on the MAIN_THREAD. Since we want to manipulate the UI we have
+                // to post to the MAIN_THREAD (I guess runOnUiThread would also do the job but this way
+                // should be preferred for more flexibility).
+                MAIN_THREAD.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Handling the corner case: no artist found.
+                        if (t.artists.total == 0) {
+                            Toast.makeText(ref, R.string.artist_search_error_noresults, Toast.LENGTH_SHORT).show();
+                        } else if (mListView != null) {
+                            repopulateListView(myList);
+                        }
+                    }
+                });
+            }
+
+            /**
+             * Callback-Method used by retrofit to handle errors on failed
+             * REST-Requests.
+             *
+             * @param error The error object.
+             */
+            @Override
+            public void failure(final RetrofitError error) {
+                // See success()-method why we post to MAIN_THREAD.
+                MAIN_THREAD.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e(LOG_TAG, "RetrofitError: " + error.getMessage());
+                        Toast.makeText(ref, R.string.artist_search_error_default, Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
 
         // close the keyboard after search by taking focus from the searchview
         mSearchView.clearFocus();
@@ -160,62 +253,14 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
         return false;
     }
 
-    /**
-     * Callback Method used be retrofit when the REST-Request completes.
-     *
-     * @param t        The result-object containing the artists information
-     * @param response The raw response object.
-     */
-    @Override
-    public void success(final ArtistsPager t, final Response response) {
-        // Seems when this method is called by retrofit we are not
-        // on the MAIN_THREAD. Since we want to manipulate the UI we have
-        // to post to the MAIN_THREAD.
-        final ArtistSearchActivity ref = this;
-
-        // translate the artistlist from REST-Request into ArtistListEntry objects.
-        final ArrayList<ArtistListEntry> myList = new ArrayList<ArtistListEntry>();
-        for (Artist myArtist : t.artists.items) {
-            ArtistListEntry myNewEntry = new ArtistListEntry(myArtist.id);
-            myNewEntry.setArtistName(myArtist.name);
-            // seems the last image in the list is the smallest; so pick that.
-            if (myArtist.images.size() > 0) {
-                myNewEntry.setCoverUrl(myArtist.images.get(myArtist.images.size() - 1).url);
-            }
-            myList.add(myNewEntry);
-        }
-
-        MAIN_THREAD.post(new Runnable() {
-            @Override
-            public void run() {
-                // Handling the corner case: no artist found.
-                if (t.artists.total == 0) {
-                    Toast.makeText(ref, R.string.artist_search_error_noresults, Toast.LENGTH_SHORT).show();
-                } else if (mListView != null) {
-                    repopulateListView(myList);
-                }
-            }
-        });
-    }
 
     /**
-     * Callback-Method used by retrofit to handle errors on failed
-     * REST-Requests.
+     * This method is called when the activity is paused/restarted (e.g. on rotation).
+     * It can be used to persist data in a {@link Bundle} which is then passed to the onCreate()
+     * method.
      *
-     * @param error The error object.
+     * @param outState The {@link Bundle} object to store the information.
      */
-    @Override
-    public void failure(final RetrofitError error) {
-        final ArtistSearchActivity ref = this;
-        MAIN_THREAD.post(new Runnable() {
-            @Override
-            public void run() {
-                Log.e(LOG_TAG, "RetrofitError: " + error.getMessage());
-                Toast.makeText(ref, R.string.artist_search_error_default, Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         // save the existing list so that it can be restored
@@ -223,8 +268,13 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
         super.onSaveInstanceState(outState);
     }
 
+    /**
+     * This is a helper method to repopulate the artist list.
+     *
+     * @param pArtistListEntries A list of {@link ArtistListEntry}'s to populate the artist list.
+     */
     private void repopulateListView(ArrayList<ArtistListEntry> pArtistListEntries) {
-        ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_search_listentry, R.id.artist_search_listentry_text, pArtistListEntries);
+        ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_listentry, R.id.artist_search_listentry_text, pArtistListEntries);
         if (mListView != null) {
             mArtistListEntries = pArtistListEntries;
             mListView.setAdapter(myAdapter);

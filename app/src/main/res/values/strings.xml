@@ -7,4 +7,5 @@
     <string name="search_hint">Search Hint</string>
     <string name="artist_search_error_noresults">Error searching artist. Maybe try another name.</string>
     <string name="artist_search_error_default">An error requesting the artist occured. Please try again later.</string>
+    <string name="title_activity_track">TrackActivity</string>
 </resources>
