@@ -31,8 +31,9 @@ import android.os.Parcelable;
 public class TrackListEntry implements Parcelable {
 
     private final String mTrackId;
-    private String mAlbumName;
     private String mTrackName;
+    private String mAlbumName;
+    private String mAlbumCover;
 
     public static final Creator<TrackListEntry> CREATOR = new Creator<TrackListEntry>() {
         @Override
@@ -48,14 +49,16 @@ public class TrackListEntry implements Parcelable {
 
     public TrackListEntry(String pTrackId) {
         mTrackId = pTrackId;
-        mAlbumName = null;
         mTrackName = null;
+        mAlbumName = null;
+        mAlbumCover = null;
     }
 
     private TrackListEntry(Parcel in) {
         mTrackId = in.readString();
-        mAlbumName = in.readString();
         mTrackName = in.readString();
+        mAlbumName = in.readString();
+        mAlbumCover = in.readString();
     }
 
     @Override
@@ -66,7 +69,36 @@ public class TrackListEntry implements Parcelable {
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(mTrackId);
-        dest.writeString(mAlbumName);
         dest.writeString(mTrackName);
+        dest.writeString(mAlbumName);
+        dest.writeString(mAlbumCover);
+    }
+
+    public String getTrackId() {
+        return mTrackId;
+    }
+
+    public String getTrackName() {
+        return mTrackName;
+    }
+
+    public void setTrackName(String pTrackName) {
+        mTrackName = pTrackName;
+    }
+
+    public String getAlbumName() {
+        return mAlbumName;
+    }
+
+    public void setAlbumName(String pAlbumName) {
+        mAlbumName = pAlbumName;
+    }
+
+    public String getAlbumCover() {
+        return mAlbumCover;
+    }
+
+    public void setAlbumCover(String pAlbumCover) {
+        mAlbumCover = pAlbumCover;
     }
 }

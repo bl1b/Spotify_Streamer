@@ -25,6 +25,7 @@
 
 package de.gruenewald.udacity.spotifystreamer;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -46,10 +47,12 @@ import java.util.Map;
 
 import de.gruenewald.udacity.spotifystreamer.model.ArtistAdapter;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
+import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import kaaes.spotify.webapi.android.models.Track;
 import kaaes.spotify.webapi.android.models.Tracks;
 import retrofit.Callback;
 import retrofit.RetrofitError;
@@ -94,7 +97,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
                     "Dummy 9",
                     "Dummy 10"
             };
-            mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.view_artist_listentry, R.id.artist_search_listentry_text, dummyEntries));
+            mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.view_artist_listentry, R.id.artist_listentry_text, dummyEntries));
         }
     }
 
@@ -140,19 +143,59 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         if (parent.getItemAtPosition(position) != null && parent.getItemAtPosition(position) instanceof ArtistListEntry) {
-            ArtistListEntry myEntry = (ArtistListEntry) parent.getItemAtPosition(position);
+            final ArtistListEntry myArtistEntry = (ArtistListEntry) parent.getItemAtPosition(position);
             Map<String, Object> myParameterMap = new HashMap<String, Object>();
             // TODO: make configurable over settings
             myParameterMap.put("country", "US");
-            mSpotifyApi.getService().getArtistTopTrack(myEntry.getArtistId(), myParameterMap, new Callback<Tracks>() {
+
+            final ArtistActivity ref = this;
+            mSpotifyApi.getService().getArtistTopTrack(myArtistEntry.getArtistId(), myParameterMap, new Callback<Tracks>() {
                 @Override
                 public void success(Tracks t, Response response) {
+                    if (t != null && t.tracks != null && t.tracks.size() > 0) {
+                        final ArrayList<TrackListEntry> myTrackListEntries = new ArrayList<TrackListEntry>();
+                        for (Track myTrack : t.tracks) {
+                            TrackListEntry myCurrentEntry = new TrackListEntry(myTrack.id);
+                            myCurrentEntry.setTrackName(myTrack.name);
+                            if (myTrack.album != null) {
+                                myCurrentEntry.setAlbumName(myTrack.album.name);
+                                if (myTrack.album.images != null && myTrack.album.images.size() > 0) {
+                                    myCurrentEntry.setAlbumCover(myTrack.album.images.get(myTrack.album.images.size() - 1).url);
+                                }
+                            }
+                            myTrackListEntries.add(myCurrentEntry);
+                        }
 
+                        MAIN_THREAD.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Intent trackIntent = new Intent(ref, TrackActivity.class);
+                                trackIntent.putExtra(TrackActivity.EXTRA_TITLE, myArtistEntry.getArtistName());
+                                trackIntent.putExtra(TrackActivity.EXTRA_NOFRESULTS, myTrackListEntries.size());
+                                trackIntent.putParcelableArrayListExtra(TrackActivity.EXTRA_TRACKLIST, myTrackListEntries);
+                                startActivity(trackIntent);
+                            }
+                        });
+
+
+                    } else {
+                        MAIN_THREAD.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                Toast.makeText(ref, R.string.track_search_error_noresults, Toast.LENGTH_SHORT).show();
+                            }
+                        });
+                    }
                 }
 
                 @Override
                 public void failure(RetrofitError error) {
-
+                    MAIN_THREAD.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            Toast.makeText(ref, R.string.track_search_error_default, Toast.LENGTH_SHORT).show();
+                        }
+                    });
                 }
             });
         } else if (parent.getItemAtPosition(position) != null) {
@@ -274,7 +317,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
      * @param pArtistListEntries A list of {@link ArtistListEntry}'s to populate the artist list.
      */
     private void repopulateListView(ArrayList<ArtistListEntry> pArtistListEntries) {
-        ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_listentry, R.id.artist_search_listentry_text, pArtistListEntries);
+        ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_listentry, R.id.artist_listentry_text, pArtistListEntries);
         if (mListView != null) {
             mArtistListEntries = pArtistListEntries;
             mListView.setAdapter(myAdapter);

@@ -8,4 +8,7 @@
     <string name="artist_search_error_noresults">Error searching artist. Maybe try another name.</string>
     <string name="artist_search_error_default">An error requesting the artist occured. Please try again later.</string>
     <string name="title_activity_track">TrackActivity</string>
+    <string name="track_search_error_default">Error fetching top tracks. Please try again later.</string>
+    <string name="track_search_error_noresults">No top tracks for this artists found. Sorry.</string>
+    <string name="track_subtitle">Top %d Tracks.</string>
 </resources>

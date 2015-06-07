@@ -26,17 +26,74 @@
 package de.gruenewald.udacity.spotifystreamer;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.internal.widget.ListViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.ArrayList;
+
+import de.gruenewald.udacity.spotifystreamer.model.TrackAdapter;
+import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
+
 
 public class TrackActivity extends AppCompatActivity {
+    static final String LOG_TAG = TrackActivity.class.getSimpleName();
+
+    static public final String EXTRA_TITLE = "track_extra_title";
+    static public final String EXTRA_NOFRESULTS = "track_extra_nofresults";
+    static public final String EXTRA_TRACKLIST = "track_extra_list";
+
+    String mTitle;
+    int mNofResults;
+    ListViewCompat mListView;
+    ArrayList<TrackListEntry> mTrackListEntries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track);
+
+        if (savedInstanceState == null) {
+            mTitle = getIntent().getStringExtra(EXTRA_TITLE);
+            mNofResults = getIntent().getIntExtra(EXTRA_NOFRESULTS, -1);
+            mTrackListEntries = getIntent().getParcelableArrayListExtra(EXTRA_TRACKLIST);
+        } else {
+            mTitle = savedInstanceState.getString(EXTRA_TITLE);
+            mNofResults = savedInstanceState.getInt(EXTRA_NOFRESULTS);
+            mTrackListEntries = savedInstanceState.getParcelableArrayList(EXTRA_TRACKLIST);
+        }
+
+        String mySubtitle = null;
+        ActionBar myActionBar = getSupportActionBar();
+
+        if (mNofResults > 0) {
+            mySubtitle = String.format(getString(R.string.track_subtitle), mNofResults);
+        }
+
+        if (myActionBar != null) {
+            if (mTitle != null) {
+                myActionBar.setTitle(mTitle);
+            }
+            if (mySubtitle != null) {
+                myActionBar.setSubtitle(mySubtitle);
+            }
+        }
+
+        mListView = (ListViewCompat) findViewById(R.id.track_listview);
+        if (mTrackListEntries != null) {
+            mListView.setAdapter(new TrackAdapter(this, R.layout.view_track_listentry, R.id.track_listentry_track, mTrackListEntries));
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putString(EXTRA_TITLE, mTitle);
+        outState.putInt(EXTRA_NOFRESULTS, mNofResults);
+        outState.putParcelableArrayList(EXTRA_TRACKLIST, mTrackListEntries);
+
+        super.onSaveInstanceState(outState);
     }
 
     @Override
