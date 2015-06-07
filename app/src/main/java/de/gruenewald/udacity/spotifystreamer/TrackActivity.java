@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ * <p/>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ * <p/>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -105,6 +105,12 @@ public class TrackActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        // overwrite "Home"-Button (Navigation Button on left) to emulate the behaviour of
+        // the hardware back-button so that the state of the previous activity is retained
+        if (item.getItemId() == android.R.id.home) {
+            this.onBackPressed();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
