@@ -34,6 +34,7 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -76,6 +77,20 @@ public class ArtistSearchActivity extends AppCompatActivity implements SearchVie
         if (savedInstanceState != null) {
             mArtistListEntries = savedInstanceState.getParcelableArrayList("existing_entries");
             repopulateListView(mArtistListEntries);
+        } else {
+            String[] dummyEntries = new String[] {
+                    "Dummy 1",
+                    "Dummy 2",
+                    "Dummy 3",
+                    "Dummy 4",
+                    "Dummy 5",
+                    "Dummy 6",
+                    "Dummy 7",
+                    "Dummy 8",
+                    "Dummy 9",
+                    "Dummy 10"
+            };
+            mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.view_artist_search_listentry, R.id.artist_search_listentry_text, dummyEntries));
         }
     }
 

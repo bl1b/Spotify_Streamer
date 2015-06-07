@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="listview_dummy_entries">
+        <item>Layout Dummy 1</item>
+        <item>Layout Dummy 2</item>
+        <item>Layout Dummy 3</item>
+        <item>Layout Dummy 4</item>
+        <item>Layout Dummy 5</item>
+        <item>Layout Dummy 6</item>
+        <item>Layout Dummy 7</item>
+        <item>Layout Dummy 8</item>
+        <item>Layout Dummy 9</item>
+    </array>
+</resources>
