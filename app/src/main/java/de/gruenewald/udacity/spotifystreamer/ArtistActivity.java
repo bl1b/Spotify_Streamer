@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ * <p/>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ * <p/>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -39,12 +39,16 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
+import butterknife.OnItemClick;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistAdapter;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
 import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
@@ -59,45 +63,36 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class ArtistActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, AdapterView.OnItemClickListener {
+public class ArtistActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
     static final String LOG_TAG = ArtistActivity.class.getSimpleName();
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
     public static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
     SearchView mSearchView;
-    ListView mListView;
+
+    @InjectView(R.id.artist_listview) ListView mListView;
+    @InjectView(R.id.artist_textview) TextView mTextView;
+
     ArrayList<ArtistListEntry> mArtistListEntries;
 
     final SpotifyApi mSpotifyApi = new SpotifyApi();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_artist);
-        // setup the listview
-        mListView = (ListView) findViewById(R.id.artist_listview);
-        mListView.setOnItemClickListener(this);
+        ButterKnife.inject(this);
+
         // fetch existing artistlist entries from the saved instance state to prevent
         // and empty list after rotating the device
         if (savedInstanceState != null) {
             mArtistListEntries = savedInstanceState.getParcelableArrayList("existing_entries");
             repopulateListView(mArtistListEntries);
         } else {
-            String[] dummyEntries = new String[]{
-                    "Dummy 1",
-                    "Dummy 2",
-                    "Dummy 3",
-                    "Dummy 4",
-                    "Dummy 5",
-                    "Dummy 6",
-                    "Dummy 7",
-                    "Dummy 8",
-                    "Dummy 9",
-                    "Dummy 10"
-            };
-            mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.view_artist_listentry, R.id.artist_listentry_text, dummyEntries));
+            repopulateListView(null);
         }
     }
 
@@ -139,7 +134,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
      * @param position The position inside the list (0-indexed).
      * @param id       The id of the list cell.
      */
-    @Override
+    @OnItemClick(R.id.artist_listview)
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         if (parent.getItemAtPosition(position) != null && parent.getItemAtPosition(position) instanceof ArtistListEntry) {
@@ -317,10 +312,16 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
      * @param pArtistListEntries A list of {@link ArtistListEntry}'s to populate the artist list.
      */
     private void repopulateListView(ArrayList<ArtistListEntry> pArtistListEntries) {
-        ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_listentry, R.id.artist_listentry_text, pArtistListEntries);
-        if (mListView != null) {
+
+        if (mListView != null && pArtistListEntries != null && pArtistListEntries.size() > 0) {
+            mTextView.setVisibility(View.GONE);
+            mListView.setVisibility(View.VISIBLE);
+            ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_listentry, R.id.artist_listentry_text, pArtistListEntries);
             mArtistListEntries = pArtistListEntries;
             mListView.setAdapter(myAdapter);
+        } else if(mListView != null) {
+            mListView.setVisibility(View.GONE);
+            mTextView.setVisibility(View.VISIBLE);
         }
     }
 }
