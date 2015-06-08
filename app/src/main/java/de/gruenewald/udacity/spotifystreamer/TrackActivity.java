@@ -31,9 +31,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.internal.widget.ListViewCompat;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import de.gruenewald.udacity.spotifystreamer.model.TrackAdapter;
 import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 
@@ -47,13 +50,15 @@ public class TrackActivity extends AppCompatActivity {
 
     String mTitle;
     int mNofResults;
-    ListViewCompat mListView;
+
+    @InjectView(R.id.track_listview) ListView mListView;
     ArrayList<TrackListEntry> mTrackListEntries;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track);
+        ButterKnife.inject(this);
 
         if (savedInstanceState == null) {
             mTitle = getIntent().getStringExtra(EXTRA_TITLE);
@@ -81,7 +86,6 @@ public class TrackActivity extends AppCompatActivity {
             }
         }
 
-        mListView = (ListViewCompat) findViewById(R.id.track_listview);
         if (mTrackListEntries != null) {
             mListView.setAdapter(new TrackAdapter(this, R.layout.view_track_listentry, R.id.track_listentry_track, mTrackListEntries));
         }
