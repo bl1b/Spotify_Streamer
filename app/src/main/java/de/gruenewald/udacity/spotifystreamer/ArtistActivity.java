@@ -287,7 +287,6 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
      */
     @Override
     public boolean onQueryTextChange(String newText) {
-        // TODO: Consider updating the listview as soon as the text changes.
         return false;
     }
 
