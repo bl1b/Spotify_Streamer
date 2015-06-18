@@ -37,7 +37,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -63,16 +62,16 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class ArtistActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    static final String LOG_TAG = ArtistActivity.class.getSimpleName();
+    static final String LOG_TAG = MainActivity.class.getSimpleName();
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
     public static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
     SearchView mSearchView;
 
-    @InjectView(R.id.artist_listview) ListView mListView;
-    @InjectView(R.id.artist_textview) TextView mTextView;
+    @InjectView(R.id.main_activity_listview) ListView mListView;
+    @InjectView(R.id.main_activity_textview) TextView mTextView;
 
     ArrayList<ArtistListEntry> mArtistListEntries;
 
@@ -83,7 +82,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_artist);
+        setContentView(R.layout.activity_main);
         ButterKnife.inject(this);
 
         // fetch existing artistlist entries from the saved instance state to prevent
@@ -134,7 +133,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
      * @param position The position inside the list (0-indexed).
      * @param id       The id of the list cell.
      */
-    @OnItemClick(R.id.artist_listview)
+    @OnItemClick(R.id.main_activity_listview)
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
         if (parent.getItemAtPosition(position) != null && parent.getItemAtPosition(position) instanceof ArtistListEntry) {
@@ -143,7 +142,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
             // TODO: make configurable over settings
             myParameterMap.put("country", "US");
 
-            final ArtistActivity ref = this;
+            final MainActivity ref = this;
             mSpotifyApi.getService().getArtistTopTrack(myArtistEntry.getArtistId(), myParameterMap, new Callback<Tracks>() {
                 @Override
                 public void success(Tracks t, Response response) {
@@ -213,7 +212,7 @@ public class ArtistActivity extends AppCompatActivity implements SearchView.OnQu
         // TODO: Read the limit from the settings
         queryMap.put("limit", 20);
 
-        final ArtistActivity ref = this;
+        final MainActivity ref = this;
         mySpotifyService.searchArtists(query, queryMap, new Callback<ArtistsPager>() {
             /**
              * Callback Method used be retrofit when the REST-Request completes.
