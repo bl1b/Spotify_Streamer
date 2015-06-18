@@ -44,9 +44,7 @@ import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 public class TrackFragment extends Fragment {
     static final String LOG_TAG = TrackFragment.class.getSimpleName();
 
-
     @InjectView(R.id.track_fragment_listview) ListView mListView;
-
 
     private String mTitle;
     private int mNofResults;
@@ -68,20 +66,7 @@ public class TrackFragment extends Fragment {
 
         ButterKnife.inject(this, rootView);
         String mySubtitle = null;
-//        ActionBar myActionBar = getActivity().getSupportActionBar();
-//
-//        if (mNofResults > 0) {
-//            mySubtitle = String.format(getString(R.string.track_subtitle), mNofResults);
-//        }
-//
-//        if (myActionBar != null) {
-//            if (mTitle != null) {
-//                myActionBar.setTitle(mTitle);
-//            }
-//            if (mySubtitle != null) {
-//                myActionBar.setSubtitle(mySubtitle);
-//            }
-//        }
+
 
         if (mTrackListEntries != null && mListView != null) {
             mListView.setAdapter(new TrackAdapter(getActivity(), R.layout.view_track_listentry, R.id.track_listentry_track, mTrackListEntries));
@@ -97,6 +82,14 @@ public class TrackFragment extends Fragment {
         outState.putParcelableArrayList(TrackActivity.EXTRA_TRACKLIST, mTrackListEntries);
 
         super.onSaveInstanceState(outState);
+    }
+
+    public String getTitle() {
+        return mTitle;
+    }
+
+    public int getNofResults() {
+        return mNofResults;
     }
 
     public void setTitle(String pTitle) {

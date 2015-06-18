@@ -26,6 +26,7 @@
 package de.gruenewald.udacity.spotifystreamer;
 
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -37,10 +38,13 @@ import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 
 public class TrackActivity extends AppCompatActivity {
     static final String LOG_TAG = TrackActivity.class.getSimpleName();
+    static final String TRACK_FRAGMENT_TAG = "tag_fragment_track";
 
     static public final String EXTRA_TITLE = "track_extra_title";
     static public final String EXTRA_NOFRESULTS = "track_extra_nofresults";
     static public final String EXTRA_TRACKLIST = "track_extra_list";
+
+    private TrackFragment mTrackFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +54,33 @@ public class TrackActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             //If onCreate() is called we're in onePane-Mode. That means MainActivity should have
             //passed in the tracklist-data via Intent-Extras.
-            TrackFragment myTrackFragment = new TrackFragment();
-            myTrackFragment.setTitle(getIntent().getStringExtra(EXTRA_TITLE));
-            myTrackFragment.setNofResults(getIntent().getIntExtra(EXTRA_NOFRESULTS, -1));
+            mTrackFragment = new TrackFragment();
+            mTrackFragment.setTitle(getIntent().getStringExtra(EXTRA_TITLE));
+            mTrackFragment.setNofResults(getIntent().getIntExtra(EXTRA_NOFRESULTS, -1));
             ArrayList<TrackListEntry> myEntries = getIntent().getParcelableArrayListExtra(EXTRA_TRACKLIST);
-            myTrackFragment.setTrackListEntries(myEntries);
+            mTrackFragment.setTrackListEntries(myEntries);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.activity_track_container, myTrackFragment)
+                    .replace(R.id.activity_track_container, mTrackFragment, TRACK_FRAGMENT_TAG)
                     .commit();
+        } else {
+            mTrackFragment = (TrackFragment) getSupportFragmentManager().findFragmentByTag(TRACK_FRAGMENT_TAG);
+        }
+
+        ActionBar myActionBar = getSupportActionBar();
+        String mySubtitle = null;
+
+        if (mTrackFragment.getNofResults() > 0) {
+            mySubtitle = String.format(getString(R.string.track_subtitle), mTrackFragment.getNofResults());
+        }
+
+        if (myActionBar != null) {
+            if (mTrackFragment.getTitle() != null) {
+                myActionBar.setTitle(mTrackFragment.getTitle());
+            }
+            if (mySubtitle != null) {
+                myActionBar.setSubtitle(mySubtitle);
+            }
         }
     }
 
