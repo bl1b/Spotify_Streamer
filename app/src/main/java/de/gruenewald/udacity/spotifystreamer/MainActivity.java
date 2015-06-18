@@ -69,11 +69,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
     SearchView mSearchView;
+    ArtistFragment mArtistFragment;
 
-    @InjectView(R.id.main_activity_listview) ListView mListView;
-    @InjectView(R.id.main_activity_textview) TextView mTextView;
-
-    ArrayList<ArtistListEntry> mArtistListEntries;
 
     final SpotifyApi mSpotifyApi = new SpotifyApi();
 
@@ -83,16 +80,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
-
-        // fetch existing artistlist entries from the saved instance state to prevent
-        // and empty list after rotating the device
-        if (savedInstanceState != null) {
-            mArtistListEntries = savedInstanceState.getParcelableArrayList("existing_entries");
-            repopulateListView(mArtistListEntries);
-        } else {
-            repopulateListView(null);
-        }
+        mArtistFragment = (ArtistFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_artist);
     }
 
     @Override
@@ -125,77 +113,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * Callback method when an item in {@link ListView} is clicked.
-     *
-     * @param parent   The parenting {@link AdapterView}. In this case the artists' Listview.
-     * @param view     The view representation of the clicked list cell.
-     * @param position The position inside the list (0-indexed).
-     * @param id       The id of the list cell.
-     */
-    @OnItemClick(R.id.main_activity_listview)
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 
-        if (parent.getItemAtPosition(position) != null && parent.getItemAtPosition(position) instanceof ArtistListEntry) {
-            final ArtistListEntry myArtistEntry = (ArtistListEntry) parent.getItemAtPosition(position);
-            Map<String, Object> myParameterMap = new HashMap<String, Object>();
-            // TODO: make configurable over settings
-            myParameterMap.put("country", "US");
-
-            final MainActivity ref = this;
-            mSpotifyApi.getService().getArtistTopTrack(myArtistEntry.getArtistId(), myParameterMap, new Callback<Tracks>() {
-                @Override
-                public void success(Tracks t, Response response) {
-                    if (t != null && t.tracks != null && t.tracks.size() > 0) {
-                        final ArrayList<TrackListEntry> myTrackListEntries = new ArrayList<TrackListEntry>();
-                        for (Track myTrack : t.tracks) {
-                            TrackListEntry myCurrentEntry = new TrackListEntry(myTrack.id);
-                            myCurrentEntry.setTrackName(myTrack.name);
-                            if (myTrack.album != null) {
-                                myCurrentEntry.setAlbumName(myTrack.album.name);
-                                if (myTrack.album.images != null && myTrack.album.images.size() > 0) {
-                                    myCurrentEntry.setAlbumCover(myTrack.album.images.get(myTrack.album.images.size() - 1).url);
-                                }
-                            }
-                            myTrackListEntries.add(myCurrentEntry);
-                        }
-
-                        MAIN_THREAD.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Intent trackIntent = new Intent(ref, TrackActivity.class);
-                                trackIntent.putExtra(TrackActivity.EXTRA_TITLE, myArtistEntry.getArtistName());
-                                trackIntent.putExtra(TrackActivity.EXTRA_NOFRESULTS, myTrackListEntries.size());
-                                trackIntent.putParcelableArrayListExtra(TrackActivity.EXTRA_TRACKLIST, myTrackListEntries);
-                                startActivity(trackIntent);
-                            }
-                        });
-
-
-                    } else {
-                        MAIN_THREAD.post(new Runnable() {
-                            @Override
-                            public void run() {
-                                Toast.makeText(ref, R.string.track_search_error_noresults, Toast.LENGTH_SHORT).show();
-                            }
-                        });
-                    }
-                }
-
-                @Override
-                public void failure(RetrofitError error) {
-                    MAIN_THREAD.post(new Runnable() {
-                        @Override
-                        public void run() {
-                            Toast.makeText(ref, R.string.track_search_error_default, Toast.LENGTH_SHORT).show();
-                        }
-                    });
-                }
-            });
-        } else if (parent.getItemAtPosition(position) != null) {
-            Log.v(LOG_TAG, "Entry at position " + position + ": " + parent.getItemAtPosition(position).toString());
-        }
-    }
 
     /**
      * This callback method is used by the {@link #mSearchView} and called when
@@ -244,8 +162,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         // Handling the corner case: no artist found.
                         if (t.artists.total == 0) {
                             Toast.makeText(ref, R.string.artist_search_error_noresults, Toast.LENGTH_SHORT).show();
-                        } else if (mListView != null) {
-                            repopulateListView(myList);
+                        } else {
+                            mArtistFragment.repopulateListView(myList);
                         }
                     }
                 });
@@ -287,39 +205,5 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
-    }
-
-
-    /**
-     * This method is called when the activity is paused/restarted (e.g. on rotation).
-     * It can be used to persist data in a {@link Bundle} which is then passed to the onCreate()
-     * method.
-     *
-     * @param outState The {@link Bundle} object to store the information.
-     */
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        // save the existing list so that it can be restored
-        outState.putParcelableArrayList(KEY_ARTLIST_ENTRIES, mArtistListEntries);
-        super.onSaveInstanceState(outState);
-    }
-
-    /**
-     * This is a helper method to repopulate the artist list.
-     *
-     * @param pArtistListEntries A list of {@link ArtistListEntry}'s to populate the artist list.
-     */
-    private void repopulateListView(ArrayList<ArtistListEntry> pArtistListEntries) {
-
-        if (mListView != null && pArtistListEntries != null && pArtistListEntries.size() > 0) {
-            mTextView.setVisibility(View.GONE);
-            mListView.setVisibility(View.VISIBLE);
-            ArtistAdapter myAdapter = new ArtistAdapter(this, R.layout.view_artist_listentry, R.id.artist_listentry_text, pArtistListEntries);
-            mArtistListEntries = pArtistListEntries;
-            mListView.setAdapter(myAdapter);
-        } else if(mListView != null) {
-            mListView.setVisibility(View.GONE);
-            mTextView.setVisibility(View.VISIBLE);
-        }
     }
 }
