@@ -26,7 +26,6 @@ package de.gruenewald.udacity.spotifystreamer;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.ActionBar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -45,10 +44,6 @@ import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 public class TrackFragment extends Fragment {
     static final String LOG_TAG = TrackFragment.class.getSimpleName();
 
-    static public final String EXTRA_TITLE = "track_extra_title";
-    static public final String EXTRA_NOFRESULTS = "track_extra_nofresults";
-    static public final String EXTRA_TRACKLIST = "track_extra_list";
-
 
     @InjectView(R.id.track_fragment_listview) ListView mListView;
 
@@ -61,9 +56,9 @@ public class TrackFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mTitle = savedInstanceState.getString(EXTRA_TITLE);
-            mNofResults = savedInstanceState.getInt(EXTRA_NOFRESULTS);
-            mTrackListEntries = savedInstanceState.getParcelableArrayList(EXTRA_TRACKLIST);
+            mTitle = savedInstanceState.getString(TrackActivity.EXTRA_TITLE);
+            mNofResults = savedInstanceState.getInt(TrackActivity.EXTRA_NOFRESULTS);
+            mTrackListEntries = savedInstanceState.getParcelableArrayList(TrackActivity.EXTRA_TRACKLIST);
         }
     }
 
@@ -97,9 +92,9 @@ public class TrackFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(EXTRA_TITLE, mTitle);
-        outState.putInt(EXTRA_NOFRESULTS, mNofResults);
-        outState.putParcelableArrayList(EXTRA_TRACKLIST, mTrackListEntries);
+        outState.putString(TrackActivity.EXTRA_TITLE, mTitle);
+        outState.putInt(TrackActivity.EXTRA_NOFRESULTS, mNofResults);
+        outState.putParcelableArrayList(TrackActivity.EXTRA_TRACKLIST, mTrackListEntries);
 
         super.onSaveInstanceState(outState);
     }

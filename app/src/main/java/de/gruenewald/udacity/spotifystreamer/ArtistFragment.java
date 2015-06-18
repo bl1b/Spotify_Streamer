@@ -131,9 +131,9 @@ public class ArtistFragment extends Fragment {
                             @Override
                             public void run() {
                                 Intent trackIntent = new Intent(getActivity(), TrackActivity.class);
-                                trackIntent.putExtra(TrackFragment.EXTRA_TITLE, myArtistEntry.getArtistName());
-                                trackIntent.putExtra(TrackFragment.EXTRA_NOFRESULTS, myTrackListEntries.size());
-                                trackIntent.putParcelableArrayListExtra(TrackFragment.EXTRA_TRACKLIST, myTrackListEntries);
+                                trackIntent.putExtra(TrackActivity.EXTRA_TITLE, myArtistEntry.getArtistName());
+                                trackIntent.putExtra(TrackActivity.EXTRA_NOFRESULTS, myTrackListEntries.size());
+                                trackIntent.putParcelableArrayListExtra(TrackActivity.EXTRA_TRACKLIST, myTrackListEntries);
                                 startActivity(trackIntent);
                             }
                         });
