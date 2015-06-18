@@ -131,9 +131,9 @@ public class ArtistFragment extends Fragment {
                             @Override
                             public void run() {
                                 Intent trackIntent = new Intent(getActivity(), TrackActivity.class);
-                                trackIntent.putExtra(TrackActivity.EXTRA_TITLE, myArtistEntry.getArtistName());
-                                trackIntent.putExtra(TrackActivity.EXTRA_NOFRESULTS, myTrackListEntries.size());
-                                trackIntent.putParcelableArrayListExtra(TrackActivity.EXTRA_TRACKLIST, myTrackListEntries);
+                                trackIntent.putExtra(TrackFragment.EXTRA_TITLE, myArtistEntry.getArtistName());
+                                trackIntent.putExtra(TrackFragment.EXTRA_NOFRESULTS, myTrackListEntries.size());
+                                trackIntent.putParcelableArrayListExtra(TrackFragment.EXTRA_TRACKLIST, myTrackListEntries);
                                 startActivity(trackIntent);
                             }
                         });
@@ -190,7 +190,7 @@ public class ArtistFragment extends Fragment {
             ArtistAdapter myAdapter = new ArtistAdapter(getActivity(), R.layout.view_artist_listentry, R.id.artist_listentry_text, pArtistListEntries);
             mArtistListEntries = pArtistListEntries;
             mListView.setAdapter(myAdapter);
-        } else if(mListView != null) {
+        } else if (mListView != null) {
             mListView.setVisibility(View.GONE);
             mTextView.setVisibility(View.VISIBLE);
         }
