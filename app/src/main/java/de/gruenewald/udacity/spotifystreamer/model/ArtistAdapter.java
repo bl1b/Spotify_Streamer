@@ -49,28 +49,29 @@ public class ArtistAdapter extends ArrayAdapter<ArtistListEntry> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        ViewHolder holder;
+        ViewHolder myHolder;
 
-        if (convertView != null && convertView.getTag() == null) {
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
-        } else {
+        if(convertView == null) {
             LayoutInflater myLayoutInflater = LayoutInflater.from(getContext());
             convertView = myLayoutInflater.inflate(R.layout.view_artist_listentry, parent, false);
-            holder = new ViewHolder(convertView);
-            convertView.setTag(holder);
+            myHolder = new ViewHolder(convertView);
+            convertView.setTag(myHolder);
         }
 
-        if (holder == null) {
-            holder = (ViewHolder) convertView.getTag();
+        if(convertView.getTag() == null) {
+            myHolder = new ViewHolder(convertView);
+            convertView.setTag(myHolder);
         }
 
-        if (getItem(position).getCoverUrl() != null) {
-            Picasso.with(getContext()).load(getItem(position).getCoverUrl()).into(holder.icon);
+        myHolder = (ViewHolder) convertView.getTag();
+        ArtistListEntry myEntry = getItem(position);
+
+        if (myEntry.getCoverUrl() != null) {
+            Picasso.with(getContext()).load(myEntry.getCoverUrl()).into(myHolder.icon);
         }
 
-        if (getItem(position).getArtistName() != null) {
-            holder.text.setText(getItem(position).getArtistName());
+        if (myEntry.getArtistName() != null) {
+            myHolder.text.setText(myEntry.getArtistName());
         }
 
         return convertView;

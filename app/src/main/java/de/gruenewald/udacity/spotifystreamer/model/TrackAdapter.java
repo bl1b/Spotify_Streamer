@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ * <p/>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ * <p/>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -37,6 +37,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import de.gruenewald.udacity.spotifystreamer.R;
 
 public class TrackAdapter extends ArrayAdapter<TrackListEntry> {
@@ -47,31 +49,45 @@ public class TrackAdapter extends ArrayAdapter<TrackListEntry> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View myView = convertView;
+        ViewHolder myHolder;
 
-        if (myView == null) {
+        if (convertView == null) {
             LayoutInflater myLayoutInflater = LayoutInflater.from(getContext());
-            myView = myLayoutInflater.inflate(R.layout.view_track_listentry, parent, false);
+            convertView = myLayoutInflater.inflate(R.layout.view_track_listentry, parent, false);
+            myHolder = new ViewHolder(convertView);
+            convertView.setTag(myHolder);
         }
 
+        if (convertView.getTag() == null) {
+            myHolder = new ViewHolder(convertView);
+            convertView.setTag(myHolder);
+        }
+
+        myHolder = (ViewHolder) convertView.getTag();
         TrackListEntry myEntry = getItem(position);
 
-        TextView myTrackNameView = (TextView) myView.findViewById(R.id.track_listentry_track);
-        TextView myAlbumNameView = (TextView) myView.findViewById(R.id.track_listentry_album);
-        ImageView myImageView = (ImageView) myView.findViewById(R.id.track_listentry_icon);
-
-        if (myImageView != null && myEntry.getAlbumCover() != null) {
-            Picasso.with(getContext()).load(myEntry.getAlbumCover()).into(myImageView);
+        if (myEntry.getAlbumCover() != null) {
+            Picasso.with(getContext()).load(myEntry.getAlbumCover()).into(myHolder.icon);
         }
 
-        if (myTrackNameView != null && myEntry.getTrackName() != null) {
-            myTrackNameView.setText(myEntry.getTrackName());
+        if (myEntry.getTrackName() != null) {
+            myHolder.track.setText(myEntry.getTrackName());
         }
 
-        if (myAlbumNameView != null && myEntry.getAlbumName() != null) {
-            myAlbumNameView.setText(myEntry.getAlbumName());
+        if (myEntry.getAlbumName() != null) {
+            myHolder.album.setText(myEntry.getAlbumName());
         }
 
-        return myView;
+        return convertView;
+    }
+
+    static class ViewHolder {
+        @InjectView(R.id.track_listentry_track) TextView track;
+        @InjectView(R.id.track_listentry_album) TextView album;
+        @InjectView(R.id.track_listentry_icon) ImageView icon;
+
+        public ViewHolder(View pReferenceView) {
+            ButterKnife.inject(this, pReferenceView);
+        }
     }
 }
