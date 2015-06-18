@@ -12,12 +12,12 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p>
+ * <p/>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p>
+ * <p/>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -37,6 +37,8 @@ import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
+import butterknife.ButterKnife;
+import butterknife.InjectView;
 import de.gruenewald.udacity.spotifystreamer.R;
 
 public class ArtistAdapter extends ArrayAdapter<ArtistListEntry> {
@@ -47,24 +49,39 @@ public class ArtistAdapter extends ArrayAdapter<ArtistListEntry> {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        View myView = convertView;
+        ViewHolder holder;
 
-        if (myView == null) {
+        if (convertView != null && convertView.getTag() == null) {
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
+        } else {
             LayoutInflater myLayoutInflater = LayoutInflater.from(getContext());
-            myView = myLayoutInflater.inflate(R.layout.view_artist_listentry, parent, false);
+            convertView = myLayoutInflater.inflate(R.layout.view_artist_listentry, parent, false);
+            holder = new ViewHolder(convertView);
+            convertView.setTag(holder);
         }
 
-        TextView myTextView = (TextView) myView.findViewById(R.id.artist_listentry_text);
-        ImageView myImageView = (ImageView) myView.findViewById(R.id.artist_listentry_icon);
-
-        if (myImageView != null && getItem(position).getCoverUrl() != null) {
-            Picasso.with(getContext()).load(getItem(position).getCoverUrl()).into(myImageView);
+        if (holder == null) {
+            holder = (ViewHolder) convertView.getTag();
         }
 
-        if (myTextView != null && getItem(position).getArtistName() != null) {
-            myTextView.setText(getItem(position).getArtistName());
+        if (getItem(position).getCoverUrl() != null) {
+            Picasso.with(getContext()).load(getItem(position).getCoverUrl()).into(holder.icon);
         }
 
-        return myView;
+        if (getItem(position).getArtistName() != null) {
+            holder.text.setText(getItem(position).getArtistName());
+        }
+
+        return convertView;
+    }
+
+    static class ViewHolder {
+        @InjectView(R.id.artist_listentry_text) TextView text;
+        @InjectView(R.id.artist_listentry_icon) ImageView icon;
+
+        public ViewHolder(View pReferenceView) {
+            ButterKnife.inject(this, pReferenceView);
+        }
     }
 }
