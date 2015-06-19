@@ -1,12 +1,33 @@
-<resources>
+<?xml version="1.0" encoding="utf-8"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright (c) 2015 by Jan Grünewald.
+  jan.gruenewald84@googlemail.com
 
+  This file is part of 'Spotify Streamer'. 'Spotify Streamer' was developed as
+  part of the Android Developer Nanodegree by Udacity.
+
+  'Spotify Streamer' is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  'Spotify Streamer' is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<resources>
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
-        <!-- Customize your theme here. -->
-        <item name="toolbarStyle">@style/AppTheme.ToolbarStyle</item>
-    </style>
-
-    <style name="AppTheme.ToolbarStyle" parent="Base.Widget.AppCompat.Toolbar">
-        <item name="android:background">#FF4CAF50</item>
+        <item name="colorPrimaryDark">@color/my_primary_dark</item>
+        <item name="colorPrimary">@color/my_primary</item>
+        <item name="colorAccent">@color/my_accent</item>
+        <item name="android:textColorPrimary">@color/my_primary_text</item>
+        <item name="android:textColorSecondary">@color/my_secondary_text</item>
+        <item name="android:textColorTertiary">@color/my_secondary_text</item>
     </style>
 </resources>

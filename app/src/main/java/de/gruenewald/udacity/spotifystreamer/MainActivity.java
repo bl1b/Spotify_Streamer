@@ -67,6 +67,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Optional @InjectView(R.id.fragment_track_container) FrameLayout mTrackContainer;
 
     final SpotifyApi mSpotifyApi = new SpotifyApi();
+    private MenuItem mSearchMenuItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +99,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         getMenuInflater().inflate(R.menu.main, menu);
 
         // setup the searchview-item and set the querylistener to be this activity
-        MenuItem searchItem = menu.findItem(R.id.artist_search_actionbar_search);
-        if (searchItem != null) {
-            mSearchView = (SearchView) MenuItemCompat.getActionView(searchItem);
+        mSearchMenuItem = menu.findItem(R.id.artist_search_actionbar_search);
+        if (mSearchMenuItem != null) {
+            mSearchView = (SearchView) MenuItemCompat.getActionView(mSearchMenuItem);
             mSearchView.setOnQueryTextListener(this);
         }
 
@@ -167,6 +168,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 MAIN_THREAD.post(new Runnable() {
                     @Override
                     public void run() {
+                        //on successful search collapse the actionview
+                        MenuItemCompat.collapseActionView(mSearchMenuItem);
                         // Handling the corner case: no artist found.
                         if (t.artists.total == 0) {
                             Toast.makeText(ref, R.string.artist_search_error_noresults, Toast.LENGTH_SHORT).show();

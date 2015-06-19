@@ -1,11 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<shape
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#FF1B5E20"/>
-    <size android:height="2px"/>
-    <padding
-        android:left="@dimen/abc_list_item_padding_horizontal_material"
-        android:right="@dimen/abc_list_item_padding_horizontal_material"/>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright (c) 2015 by Jan Grünewald.
+  jan.gruenewald84@googlemail.com
 
-</shape>
+  This file is part of 'Spotify Streamer'. 'Spotify Streamer' was developed as
+  part of the Android Developer Nanodegree by Udacity.
+
+  'Spotify Streamer' is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  'Spotify Streamer' is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<layer-list
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:left="@dimen/listentry_height">
+
+        <shape
+            android:shape="rectangle">
+
+            <solid android:color="@color/my_divider_color"/>
+            <size android:height="1dp"/>
+
+        </shape>
+    </item>
+</layer-list>

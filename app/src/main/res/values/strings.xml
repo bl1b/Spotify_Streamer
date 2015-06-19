@@ -1,3 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright (c) 2015 by Jan Grünewald.
+  jan.gruenewald84@googlemail.com
+
+  This file is part of 'Spotify Streamer'. 'Spotify Streamer' was developed as
+  part of the Android Developer Nanodegree by Udacity.
+
+  'Spotify Streamer' is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  'Spotify Streamer' is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
 <resources>
     <string name="app_name">Spotify Streamer</string>
     <string name="hello_world">Hello world!</string>
@@ -12,4 +34,6 @@
     <string name="track_search_error_noresults">No top tracks for this artists found. Sorry.</string>
     <string name="track_subtitle">Top %d Tracks.</string>
     <string name="artist_textview_placeholder">Please use the search to get a list of available artists.</string>
+    <string name="image_description">Artist image</string>
+    <string name="track_image_description">Album Cover</string>
 </resources>

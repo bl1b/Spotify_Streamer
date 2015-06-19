@@ -19,21 +19,14 @@
   You should have received a copy of the GNU General Public License
   along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ArtistActivity">
 
-    <item
-        android:id="@+id/artist_search_actionbar_search"
-        android:icon="@drawable/abc_ic_search_api_mtrl_alpha"
-        android:title="@string/artist_search_actionbar_search"
-        app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="collapseActionView|ifRoom" />
-
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
-</menu>
+<resources>
+    <color name="my_primary_dark">#FF00796B</color>
+    <color name="my_primary">#FF009688</color>
+    <color name="my_primary_light">#FFB2DFDB</color>
+    <color name="my_icons">#FFFFFFFF</color>
+    <color name="my_accent">#FFFF9800</color>
+    <color name="my_primary_text">#FF212121</color>
+    <color name="my_secondary_text">#FF727272</color>
+    <color name="my_divider_color">#FFB6B6B6</color>
+</resources>
