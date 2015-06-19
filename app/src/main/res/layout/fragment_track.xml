@@ -25,14 +25,24 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="@dimen/element_inner_padding"
     tools:context=".TrackFragment">
+
+    <android.support.v7.widget.AppCompatTextView
+        android:id="@+id/track_fragment_textview"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:background="@color/my_primary_light"
+        android:gravity="center"
+        android:text="@string/track_textview_placeholder"/>
 
     <android.support.v7.internal.widget.ListViewCompat
         android:id="@+id/track_fragment_listview"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:layout_marginTop="@dimen/margin_small"
         android:divider="@drawable/listentry_divider"
-        tools:entries="@array/listview_dummy_entries"/>
+        android:visibility="gone"/>
 
 </RelativeLayout>

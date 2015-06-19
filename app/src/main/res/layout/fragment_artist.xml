@@ -43,7 +43,6 @@
         android:layout_marginBottom="@dimen/margin_small"
         android:layout_marginTop="@dimen/margin_small"
         android:divider="@drawable/listentry_divider"
-        android:visibility="gone"
-        tools:entries="@array/listview_dummy_entries"/>
+        android:visibility="gone" />
 
 </RelativeLayout>

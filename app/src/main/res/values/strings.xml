@@ -36,4 +36,5 @@
     <string name="artist_textview_placeholder">Please use the search to get a list of available artists.</string>
     <string name="image_description">Artist image</string>
     <string name="track_image_description">Album Cover</string>
+    <string name="track_textview_placeholder">Please select an artist from the artist list to show its top tracks.</string>
 </resources>
