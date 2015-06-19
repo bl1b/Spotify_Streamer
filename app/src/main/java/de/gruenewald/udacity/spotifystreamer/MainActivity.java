@@ -25,7 +25,6 @@
 
 package de.gruenewald.udacity.spotifystreamer;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -35,10 +34,7 @@ import android.support.v7.widget.SearchView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -47,16 +43,12 @@ import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
-import butterknife.OnItemClick;
-import de.gruenewald.udacity.spotifystreamer.model.ArtistAdapter;
+import butterknife.Optional;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
-import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
-import kaaes.spotify.webapi.android.models.Track;
-import kaaes.spotify.webapi.android.models.Tracks;
 import retrofit.Callback;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -66,21 +58,38 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     static final String LOG_TAG = MainActivity.class.getSimpleName();
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
-    public static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
     SearchView mSearchView;
     ArtistFragment mArtistFragment;
 
+    boolean mTwoPane;
+
+    @Optional @InjectView(R.id.fragment_track_container) FrameLayout mTrackContainer;
 
     final SpotifyApi mSpotifyApi = new SpotifyApi();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
+        ButterKnife.inject(this);
+
         mArtistFragment = (ArtistFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_artist);
+
+        TrackFragment myTrackFragment = null;
+        //if savedInstanceState != null we are re-creating a previously existing MainActivity; thus
+        //there should be a TrackFragment already.
+        if (savedInstanceState != null && mTrackContainer != null) {
+            myTrackFragment = (TrackFragment) getSupportFragmentManager().findFragmentByTag(TrackActivity.TRACK_FRAGMENT_TAG);
+        } else if (mTrackContainer != null) {
+            myTrackFragment = new TrackFragment();
+            getSupportFragmentManager().beginTransaction()
+                    .replace(mTrackContainer.getId(), myTrackFragment, TrackActivity.TRACK_FRAGMENT_TAG)
+                    .commit();
+        }
+
+        mArtistFragment.setTrackFragment(myTrackFragment);
     }
 
     @Override
@@ -112,7 +121,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     /**

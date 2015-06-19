@@ -49,6 +49,7 @@ public class TrackFragment extends Fragment {
     private String mTitle;
     private int mNofResults;
     private ArrayList<TrackListEntry> mTrackListEntries;
+    private View mRootView;
 
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -62,17 +63,13 @@ public class TrackFragment extends Fragment {
 
     @Nullable @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_track, container, false);
+        mRootView = inflater.inflate(R.layout.fragment_track, container, false);
 
-        ButterKnife.inject(this, rootView);
-        String mySubtitle = null;
+        ButterKnife.inject(this, mRootView);
+        //after creation of view (re)-populate the list
+        populateListView(mTrackListEntries);
 
-
-        if (mTrackListEntries != null && mListView != null) {
-            mListView.setAdapter(new TrackAdapter(getActivity(), R.layout.view_track_listentry, R.id.track_listentry_track, mTrackListEntries));
-        }
-
-        return rootView;
+        return mRootView;
     }
 
     @Override
@@ -82,6 +79,18 @@ public class TrackFragment extends Fragment {
         outState.putParcelableArrayList(TrackActivity.EXTRA_TRACKLIST, mTrackListEntries);
 
         super.onSaveInstanceState(outState);
+    }
+
+    public void populateListView(ArrayList<TrackListEntry> pTrackListEntries) {
+
+        setTrackListEntries(pTrackListEntries);
+
+        if (pTrackListEntries != null && pTrackListEntries.size() > 0 && mListView != null) {
+            mListView.setVisibility(View.VISIBLE);
+            mListView.setAdapter(new TrackAdapter(getActivity(), R.layout.view_track_listentry, R.id.track_listentry_track, mTrackListEntries));
+        } else {
+            //TODO hiding listview and stuff.
+        }
     }
 
     public String getTitle() {

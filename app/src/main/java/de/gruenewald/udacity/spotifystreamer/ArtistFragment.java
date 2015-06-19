@@ -70,6 +70,12 @@ public class ArtistFragment extends Fragment {
     @InjectView(R.id.artist_fragment_listview) ListView mListView;
     @InjectView(R.id.artist_fragment_textview) TextView mTextView;
 
+    private TrackFragment mTrackFragment;
+
+    public ArtistFragment() {
+        mTrackFragment = null;
+    }
+
     @Override public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
@@ -130,11 +136,20 @@ public class ArtistFragment extends Fragment {
                         MAIN_THREAD.post(new Runnable() {
                             @Override
                             public void run() {
-                                Intent trackIntent = new Intent(getActivity(), TrackActivity.class);
-                                trackIntent.putExtra(TrackActivity.EXTRA_TITLE, myArtistEntry.getArtistName());
-                                trackIntent.putExtra(TrackActivity.EXTRA_NOFRESULTS, myTrackListEntries.size());
-                                trackIntent.putParcelableArrayListExtra(TrackActivity.EXTRA_TRACKLIST, myTrackListEntries);
-                                startActivity(trackIntent);
+                                //Check if mTrackFragment is set. If not we're on a smartphone
+                                //and start a new TrackActivity as an intent. Else we re-use
+                                //the fragment's instance and update the view.
+                                if (mTrackFragment == null) {
+                                    Intent trackIntent = new Intent(getActivity(), TrackActivity.class);
+                                    trackIntent.putExtra(TrackActivity.EXTRA_TITLE, myArtistEntry.getArtistName());
+                                    trackIntent.putExtra(TrackActivity.EXTRA_NOFRESULTS, myTrackListEntries.size());
+                                    trackIntent.putParcelableArrayListExtra(TrackActivity.EXTRA_TRACKLIST, myTrackListEntries);
+                                    startActivity(trackIntent);
+                                } else {
+                                    mTrackFragment.setTitle(myArtistEntry.getArtistName());
+                                    mTrackFragment.setNofResults(myTrackListEntries.size());
+                                    mTrackFragment.populateListView(myTrackListEntries);
+                                }
                             }
                         });
 
@@ -194,5 +209,9 @@ public class ArtistFragment extends Fragment {
             mListView.setVisibility(View.GONE);
             mTextView.setVisibility(View.VISIBLE);
         }
+    }
+
+    public void setTrackFragment(TrackFragment pTrackFragment) {
+        mTrackFragment = pTrackFragment;
     }
 }

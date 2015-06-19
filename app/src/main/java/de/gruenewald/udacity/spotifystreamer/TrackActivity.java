@@ -61,7 +61,7 @@ public class TrackActivity extends AppCompatActivity {
             mTrackFragment.setTrackListEntries(myEntries);
 
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.activity_track_container, mTrackFragment, TRACK_FRAGMENT_TAG)
+                    .replace(R.id.fragment_track_container, mTrackFragment, TRACK_FRAGMENT_TAG)
                     .commit();
         } else {
             mTrackFragment = (TrackFragment) getSupportFragmentManager().findFragmentByTag(TRACK_FRAGMENT_TAG);
