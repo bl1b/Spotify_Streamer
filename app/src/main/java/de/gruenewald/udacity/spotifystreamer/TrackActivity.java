@@ -26,6 +26,7 @@
 package de.gruenewald.udacity.spotifystreamer;
 
 import android.content.DialogInterface;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -58,6 +59,12 @@ public class TrackActivity extends AppCompatActivity implements DialogInterface.
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //constrain orientation to portrait on smartphones
+        if(getResources().getBoolean(R.bool.portrait_only)){
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         setContentView(R.layout.activity_track);
 
         AppController.getInstance().registerTrackActivity(this);
