@@ -59,11 +59,10 @@ import retrofit.client.Response;
  * Created by Jan on 27.06.2015.
  */
 public class AppController {
-    static final String LOG_TAG = AppController.class.getSimpleName();
-
+    private static final String LOG_TAG = AppController.class.getSimpleName();
     private static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
-    private static final SpotifyApi SPOTIFY_API = new SpotifyApi();
 
+    public static final SpotifyApi SPOTIFY_API = new SpotifyApi();
     public static final String TRACK_PLAYBACK_TAG = "tag_fragment_playback";
 
     private static AppController instance = new AppController();
@@ -160,8 +159,6 @@ public class AppController {
                             }
                         }
                     });
-
-
                 } else {
                     MAIN_THREAD.post(new Runnable() {
                         @Override

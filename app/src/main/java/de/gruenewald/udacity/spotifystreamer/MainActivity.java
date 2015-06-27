@@ -43,7 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.ButterKnife;
-import butterknife.InjectView;
 import butterknife.OnItemClick;
 import butterknife.Optional;
 import de.gruenewald.udacity.spotifystreamer.controller.AppController;
@@ -68,12 +67,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     private ArtistFragment mArtistFragment;
     private TrackFragment mTrackFragment;
+    private FrameLayout mTrackContainer;
 
-    boolean mTwoPane;
-
-    @Optional @InjectView(R.id.fragment_track_container) FrameLayout mTrackContainer;
-
-    final SpotifyApi mSpotifyApi = new SpotifyApi();
     private MenuItem mSearchMenuItem;
 
     @Override
@@ -81,9 +76,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
-        ButterKnife.inject(this);
 
         mArtistFragment = (ArtistFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_artist);
+
+        if (findViewById(R.id.fragment_track_container) instanceof FrameLayout) {
+            mTrackContainer = (FrameLayout) findViewById(R.id.fragment_track_container);
+        }
 
         mTrackFragment = null;
         //if savedInstanceState != null we are re-creating a previously existing MainActivity; thus
@@ -100,6 +98,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         AppController.getInstance().registerMainActivity(this);
         AppController.getInstance().registerArtistFragment(mArtistFragment);
         AppController.getInstance().registerTrackFragment(mTrackFragment);
+    }
+
+    @Override protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        ButterKnife.inject(this);
     }
 
     @Override protected void onDestroy() {
@@ -172,7 +175,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextSubmit(final String query) {
 
-        final SpotifyService mySpotifyService = mSpotifyApi.getService();
+        final SpotifyService mySpotifyService = AppController.SPOTIFY_API.getService();
         Map<String, Object> queryMap = new HashMap<String, Object>();
         // TODO: Read the limit from the settings
         queryMap.put("limit", 20);
