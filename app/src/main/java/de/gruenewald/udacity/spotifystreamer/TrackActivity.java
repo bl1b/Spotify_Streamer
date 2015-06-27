@@ -25,40 +25,52 @@
 
 package de.gruenewald.udacity.spotifystreamer;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import java.util.ArrayList;
 
+import butterknife.ButterKnife;
+import butterknife.OnItemClick;
+import de.gruenewald.udacity.spotifystreamer.controller.AppController;
+import de.gruenewald.udacity.spotifystreamer.exception.MissingDependencyException;
+import de.gruenewald.udacity.spotifystreamer.exception.ParameterException;
+import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
 import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 
 
-public class TrackActivity extends AppCompatActivity {
+public class TrackActivity extends AppCompatActivity implements DialogInterface.OnDismissListener {
     static final String LOG_TAG = TrackActivity.class.getSimpleName();
+
     static final String TRACK_FRAGMENT_TAG = "tag_fragment_track";
 
-    static public final String EXTRA_TITLE = "track_extra_title";
-    static public final String EXTRA_NOFRESULTS = "track_extra_nofresults";
+
+    static public final String EXTRA_ARTISTENTRY = "track_extra_artistentry";
     static public final String EXTRA_TRACKLIST = "track_extra_list";
 
+    private ArtistListEntry mArtistListEntry;
     private TrackFragment mTrackFragment;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_track);
+
+        AppController.getInstance().registerTrackActivity(this);
 
         if (savedInstanceState == null) {
             //If onCreate() is called we're in onePane-Mode. That means MainActivity should have
             //passed in the tracklist-data via Intent-Extras.
+            mArtistListEntry = getIntent().getParcelableExtra(EXTRA_ARTISTENTRY);
             mTrackFragment = new TrackFragment();
-            mTrackFragment.setTitle(getIntent().getStringExtra(EXTRA_TITLE));
-            mTrackFragment.setNofResults(getIntent().getIntExtra(EXTRA_NOFRESULTS, -1));
+            mTrackFragment.setTitle(mArtistListEntry.getArtistName());
             ArrayList<TrackListEntry> myEntries = getIntent().getParcelableArrayListExtra(EXTRA_TRACKLIST);
             mTrackFragment.setTrackListEntries(myEntries);
+            mTrackFragment.setNofResults(myEntries.size());
 
             getSupportFragmentManager().beginTransaction()
                     .replace(R.id.fragment_track_container, mTrackFragment, TRACK_FRAGMENT_TAG)
@@ -82,17 +94,25 @@ public class TrackActivity extends AppCompatActivity {
                 myActionBar.setSubtitle(mySubtitle);
             }
         }
+
+        AppController.getInstance().registerTrackFragment(mTrackFragment);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    @Override protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+
+        if (mTrackFragment != null) {
+            ButterKnife.inject(this, mTrackFragment.getView());
+        }
+    }
+
+    @Override public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
+    @Override public boolean onOptionsItemSelected(MenuItem item) {
         // overwrite "Home"-Button (Navigation Button on left) to emulate the behaviour of
         // the hardware back-button so that the state of the previous activity is retained
         if (item.getItemId() == android.R.id.home) {
@@ -101,5 +121,29 @@ public class TrackActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        AppController.getInstance().unregisterTrackActivity();
+    }
+
+    @OnItemClick(R.id.track_fragment_listview) public void onTrackItemClicked(int position) {
+        //TODO: Create visual error-feedback for the user
+        try {
+            AppController.getInstance().handleOnTrackSelected(position, false);
+        } catch (MissingDependencyException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        } catch (ParameterException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+    }
+
+    @Override public void onDismiss(DialogInterface dialog) {
+        AppController.getInstance().unregisterPlaybackFragment();
+        getSupportFragmentManager().popBackStack();
+//        getSupportFragmentManager().beginTransaction()
+//                .remove(getSupportFragmentManager().findFragmentByTag(TRACK_PLAYBACK_TAG))
+//                .commit();
     }
 }

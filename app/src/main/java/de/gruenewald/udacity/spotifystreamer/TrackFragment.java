@@ -45,6 +45,10 @@ import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 public class TrackFragment extends Fragment {
     static final String LOG_TAG = TrackFragment.class.getSimpleName();
 
+    static final String SAVEDINSTANCE_TITLE = "fragment_track_save_title";
+    static final String SAVEDINSTANCE_RESULTS = "fragment_track_save_results";
+    static final String SAVEDINSTANCE_LIST = "fragment_track_save_list";
+
     @InjectView(R.id.track_fragment_listview) ListView mListView;
     @InjectView(R.id.track_fragment_textview) TextView mTextView;
 
@@ -57,9 +61,9 @@ public class TrackFragment extends Fragment {
         super.onCreate(savedInstanceState);
 
         if (savedInstanceState != null) {
-            mTitle = savedInstanceState.getString(TrackActivity.EXTRA_TITLE);
-            mNofResults = savedInstanceState.getInt(TrackActivity.EXTRA_NOFRESULTS);
-            mTrackListEntries = savedInstanceState.getParcelableArrayList(TrackActivity.EXTRA_TRACKLIST);
+            mTitle = savedInstanceState.getString(SAVEDINSTANCE_TITLE);
+            mNofResults = savedInstanceState.getInt(SAVEDINSTANCE_RESULTS);
+            mTrackListEntries = savedInstanceState.getParcelableArrayList(SAVEDINSTANCE_LIST);
         }
     }
 
@@ -76,9 +80,9 @@ public class TrackFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        outState.putString(TrackActivity.EXTRA_TITLE, mTitle);
-        outState.putInt(TrackActivity.EXTRA_NOFRESULTS, mNofResults);
-        outState.putParcelableArrayList(TrackActivity.EXTRA_TRACKLIST, mTrackListEntries);
+        outState.putString(SAVEDINSTANCE_TITLE, mTitle);
+        outState.putInt(SAVEDINSTANCE_RESULTS, mNofResults);
+        outState.putParcelableArrayList(SAVEDINSTANCE_LIST, mTrackListEntries);
 
         super.onSaveInstanceState(outState);
     }
@@ -111,6 +115,10 @@ public class TrackFragment extends Fragment {
 
     public void setNofResults(int pNofResults) {
         mNofResults = pNofResults;
+    }
+
+    public ArrayList<TrackListEntry> getTrackListEntries() {
+        return mTrackListEntries;
     }
 
     public void setTrackListEntries(ArrayList<TrackListEntry> pTrackListEntries) {

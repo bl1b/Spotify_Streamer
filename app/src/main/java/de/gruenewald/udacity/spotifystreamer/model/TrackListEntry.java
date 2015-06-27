@@ -34,6 +34,7 @@ public class TrackListEntry implements Parcelable {
     private String mTrackName;
     private String mAlbumName;
     private String mAlbumCover;
+    private String mAlbumCoverLarge;
 
     public static final Creator<TrackListEntry> CREATOR = new Creator<TrackListEntry>() {
         @Override
@@ -52,6 +53,7 @@ public class TrackListEntry implements Parcelable {
         mTrackName = null;
         mAlbumName = null;
         mAlbumCover = null;
+        mAlbumCoverLarge = null;
     }
 
     private TrackListEntry(Parcel in) {
@@ -59,6 +61,7 @@ public class TrackListEntry implements Parcelable {
         mTrackName = in.readString();
         mAlbumName = in.readString();
         mAlbumCover = in.readString();
+        mAlbumCoverLarge = in.readString();
     }
 
     @Override
@@ -72,6 +75,17 @@ public class TrackListEntry implements Parcelable {
         dest.writeString(mTrackName);
         dest.writeString(mAlbumName);
         dest.writeString(mAlbumCover);
+        dest.writeString(mAlbumCoverLarge);
+    }
+
+    @Override public String toString() {
+        return "TrackListEntry{" +
+                "mTrackId='" + mTrackId + '\'' +
+                ", mTrackName='" + mTrackName + '\'' +
+                ", mAlbumName='" + mAlbumName + '\'' +
+                ", mAlbumCover='" + mAlbumCover + '\'' +
+                ", mAlbumCoverLarge='" + mAlbumCoverLarge + '\'' +
+                '}';
     }
 
     public String getTrackId() {
@@ -100,5 +114,13 @@ public class TrackListEntry implements Parcelable {
 
     public void setAlbumCover(String pAlbumCover) {
         mAlbumCover = pAlbumCover;
+    }
+
+    public String getAlbumCoverLarge() {
+        return mAlbumCoverLarge;
+    }
+
+    public void setAlbumCoverLarge(String pAlbumCoverLarge) {
+        mAlbumCoverLarge = pAlbumCoverLarge;
     }
 }

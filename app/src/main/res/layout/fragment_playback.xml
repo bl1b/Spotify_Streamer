@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  Copyright (c) 2015 by Jan Grünewald.
+  jan.gruenewald84@googlemail.com
+
+  This file is part of 'Spotify Streamer'. 'Spotify Streamer' was developed as
+  part of the Android Developer Nanodegree by Udacity.
+
+  'Spotify Streamer' is free software: you can redistribute it and/or modify
+  it under the terms of the GNU General Public License as published by
+  the Free Software Foundation, either version 3 of the License, or
+  (at your option) any later version.
+
+  'Spotify Streamer' is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+  GNU General Public License for more details.
+
+  You should have received a copy of the GNU General Public License
+  along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
+  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/my_primary_light"
+    android:padding="@dimen/element_inner_padding">
+
+    <TextView
+        android:id="@+id/fragment_playback_text_artist"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+        tools:text="Beeker"/>
+
+    <TextView
+        android:id="@+id/fragment_playback_text_album"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Small"
+        tools:text="Beeker and the Muppets"/>
+
+    <ImageView
+        android:id="@+id/fragment_playback_image_cover"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_margin="@dimen/margin_small"
+        android:layout_weight="5"
+        android:contentDescription="@string/playback_image_cover"
+        android:scaleType="fitCenter"
+        tools:src="@drawable/beeker"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/fragment_playback_text_track"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+            tools:text="The mighty beeker song"/>
+
+        <SeekBar
+            android:id="@+id/fragment_playback_scrub_track"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageButton
+                android:id="@+id/fragment_playback_button_prev"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/playback_button_prev"
+                android:src="@android:drawable/ic_media_previous"/>
+
+            <ImageButton
+                android:id="@+id/fragment_playback_button_play"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/playback_button_play"
+                android:src="@android:drawable/ic_media_play"/>
+
+            <ImageButton
+                android:id="@+id/fragment_playback_button_next"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/playback_button_next"
+                android:src="@android:drawable/ic_media_next"/>
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

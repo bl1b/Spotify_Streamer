@@ -21,8 +21,7 @@
   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~-->
 
 <resources>
-    <string name="app_name">Spotify Streamer</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name" translatable="false">Spotify Streamer</string>
     <string name="action_settings">Settings</string>
     <string name="artist_search_actionbar_search">Search artist</string>
     <string name="search_label">Search Label</string>
@@ -37,4 +36,9 @@
     <string name="image_description">Artist image</string>
     <string name="track_image_description">Album Cover</string>
     <string name="track_textview_placeholder">Please select an artist from the artist list to show its top tracks.</string>
+
+    <string name="playback_button_prev">play the previous track</string>
+    <string name="playback_button_play">start or stop current track</string>
+    <string name="playback_button_next">play the next track</string>
+    <string name="playback_image_cover">cover image of the current album</string>
 </resources>

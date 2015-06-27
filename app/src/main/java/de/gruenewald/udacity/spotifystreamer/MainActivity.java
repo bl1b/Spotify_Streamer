@@ -25,6 +25,7 @@
 
 package de.gruenewald.udacity.spotifystreamer;
 
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -43,7 +44,11 @@ import java.util.Map;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import butterknife.OnItemClick;
 import butterknife.Optional;
+import de.gruenewald.udacity.spotifystreamer.controller.AppController;
+import de.gruenewald.udacity.spotifystreamer.exception.MissingDependencyException;
+import de.gruenewald.udacity.spotifystreamer.exception.ParameterException;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
 import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
@@ -54,13 +59,15 @@ import retrofit.RetrofitError;
 import retrofit.client.Response;
 
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, DialogInterface.OnDismissListener {
 
     static final String LOG_TAG = MainActivity.class.getSimpleName();
     static final Handler MAIN_THREAD = new Handler(Looper.getMainLooper());
 
-    SearchView mSearchView;
-    ArtistFragment mArtistFragment;
+    private SearchView mSearchView;
+
+    private ArtistFragment mArtistFragment;
+    private TrackFragment mTrackFragment;
 
     boolean mTwoPane;
 
@@ -78,19 +85,50 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         mArtistFragment = (ArtistFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_artist);
 
-        TrackFragment myTrackFragment = null;
+        mTrackFragment = null;
         //if savedInstanceState != null we are re-creating a previously existing MainActivity; thus
         //there should be a TrackFragment already.
         if (savedInstanceState != null && mTrackContainer != null) {
-            myTrackFragment = (TrackFragment) getSupportFragmentManager().findFragmentByTag(TrackActivity.TRACK_FRAGMENT_TAG);
+            mTrackFragment = (TrackFragment) getSupportFragmentManager().findFragmentByTag(TrackActivity.TRACK_FRAGMENT_TAG);
         } else if (mTrackContainer != null) {
-            myTrackFragment = new TrackFragment();
+            mTrackFragment = new TrackFragment();
             getSupportFragmentManager().beginTransaction()
-                    .replace(mTrackContainer.getId(), myTrackFragment, TrackActivity.TRACK_FRAGMENT_TAG)
+                    .replace(mTrackContainer.getId(), mTrackFragment, TrackActivity.TRACK_FRAGMENT_TAG)
                     .commit();
         }
 
-        mArtistFragment.setTrackFragment(myTrackFragment);
+        AppController.getInstance().registerMainActivity(this);
+        AppController.getInstance().registerArtistFragment(mArtistFragment);
+        AppController.getInstance().registerTrackFragment(mTrackFragment);
+    }
+
+    @Override protected void onDestroy() {
+        super.onDestroy();
+        AppController.getInstance().unregisterMainActivity();
+    }
+
+    @OnItemClick(R.id.artist_fragment_listview)
+    public void onArtistItemClicked(int pArtistPosition) {
+        //TODO: Create visual error-feedback for the user
+        try {
+            AppController.getInstance().handleOnArtistSelected(pArtistPosition, (mTrackFragment != null));
+        } catch (MissingDependencyException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        } catch (ParameterException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
+    }
+
+    @Optional @OnItemClick(R.id.track_fragment_listview)
+    public void onTrackItemClicked(int pTrackPosition) {
+        //TODO: Create visual error-feedback for the user
+        try {
+            AppController.getInstance().handleOnTrackSelected(pTrackPosition, true);
+        } catch (MissingDependencyException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        } catch (ParameterException e) {
+            Log.e(LOG_TAG, e.getMessage());
+        }
     }
 
     @Override
@@ -157,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     // seems the last image in the list is the smallest; so pick that.
                     if (myArtist.images.size() > 0) {
                         myNewEntry.setCoverUrl(myArtist.images.get(myArtist.images.size() - 1).url);
+                        myNewEntry.setCoverUrlLarge(myArtist.images.get(0).url);
                     }
                     myList.add(myNewEntry);
                 }
@@ -216,5 +255,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     public boolean onQueryTextChange(String newText) {
         return false;
+    }
+
+    @Override public void onDismiss(DialogInterface dialog) {
+        AppController.getInstance().unregisterPlaybackFragment();
+        getSupportFragmentManager().popBackStack();
     }
 }
