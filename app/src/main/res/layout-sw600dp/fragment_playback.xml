@@ -47,7 +47,7 @@
 
     <ImageView
         android:id="@+id/fragment_playback_image_cover"
-        android:layout_width="match_parent"
+        android:layout_width="540dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/margin_small"
         android:layout_weight="1"
