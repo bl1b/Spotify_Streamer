@@ -50,7 +50,6 @@ import de.gruenewald.udacity.spotifystreamer.controller.AppController;
 import de.gruenewald.udacity.spotifystreamer.exception.MissingDependencyException;
 import de.gruenewald.udacity.spotifystreamer.exception.ParameterException;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
-import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
@@ -77,7 +76,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         super.onCreate(savedInstanceState);
 
         //constrain orientation to portrait on smartphones
-        if(getResources().getBoolean(R.bool.portrait_only)){
+        if (getResources().getBoolean(R.bool.portrait_only)) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
@@ -118,6 +117,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @OnItemClick(R.id.artist_fragment_listview)
     public void onArtistItemClicked(int pArtistPosition) {
+        if (mArtistFragment != null) {
+            mArtistFragment.setArtlistPosition(pArtistPosition);
+        }
+
         //TODO: Create visual error-feedback for the user
         try {
             AppController.getInstance().handleOnArtistSelected(pArtistPosition, (mTrackFragment != null));
@@ -130,6 +133,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Optional @OnItemClick(R.id.track_fragment_listview)
     public void onTrackItemClicked(int pTrackPosition) {
+        if (mTrackFragment != null) {
+            mTrackFragment.setTrackListPosition(pTrackPosition);
+        }
         //TODO: Create visual error-feedback for the user
         try {
             AppController.getInstance().handleOnTrackSelected(pTrackPosition, true);

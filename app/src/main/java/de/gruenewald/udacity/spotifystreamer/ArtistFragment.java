@@ -45,8 +45,11 @@ import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
  */
 public class ArtistFragment extends Fragment {
     static final String LOG_TAG = ArtistFragment.class.getSimpleName();
+
+    static final String KEY_ARTLIST_POSITION = "artlist_position";
     static final String KEY_ARTLIST_ENTRIES = "existing_entries";
 
+    private int mArtlistPosition;
     private ArrayList<ArtistListEntry> mArtistListEntries;
 
     @InjectView(R.id.artist_fragment_listview) ListView mListView;
@@ -65,9 +68,11 @@ public class ArtistFragment extends Fragment {
         // fetch existing artistlist entries from the saved instance state to prevent
         // and empty list after rotating the device
         if (savedInstanceState != null) {
+            mArtlistPosition = savedInstanceState.getInt(KEY_ARTLIST_POSITION);
             mArtistListEntries = savedInstanceState.getParcelableArrayList(KEY_ARTLIST_ENTRIES);
             repopulateListView(mArtistListEntries);
         } else {
+            mArtlistPosition = -1;
             repopulateListView(null);
         }
 
@@ -84,6 +89,7 @@ public class ArtistFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         // save the existing list so that it can be restored
+        outState.putInt(KEY_ARTLIST_POSITION, mArtlistPosition);
         outState.putParcelableArrayList(KEY_ARTLIST_ENTRIES, mArtistListEntries);
         super.onSaveInstanceState(outState);
     }
@@ -113,5 +119,13 @@ public class ArtistFragment extends Fragment {
 
     public ArrayList<ArtistListEntry> getArtistListEntries() {
         return mArtistListEntries;
+    }
+
+    public int getArtlistPosition() {
+        return mArtlistPosition;
+    }
+
+    public void setArtlistPosition(int pArtlistPosition) {
+        mArtlistPosition = pArtlistPosition;
     }
 }

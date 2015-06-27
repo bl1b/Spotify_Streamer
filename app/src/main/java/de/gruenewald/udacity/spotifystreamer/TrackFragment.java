@@ -47,6 +47,7 @@ public class TrackFragment extends Fragment {
 
     static final String SAVEDINSTANCE_TITLE = "fragment_track_save_title";
     static final String SAVEDINSTANCE_RESULTS = "fragment_track_save_results";
+    static final String SAVEDINSTANCE_POSITION = "fragment_track_save_position";
     static final String SAVEDINSTANCE_LIST = "fragment_track_save_list";
 
     @InjectView(R.id.track_fragment_listview) ListView mListView;
@@ -54,6 +55,7 @@ public class TrackFragment extends Fragment {
 
     private String mTitle;
     private int mNofResults;
+    private int mTrackListPosition;
     private ArrayList<TrackListEntry> mTrackListEntries;
     private View mRootView;
 
@@ -63,7 +65,10 @@ public class TrackFragment extends Fragment {
         if (savedInstanceState != null) {
             mTitle = savedInstanceState.getString(SAVEDINSTANCE_TITLE);
             mNofResults = savedInstanceState.getInt(SAVEDINSTANCE_RESULTS);
+            mTrackListPosition = savedInstanceState.getInt(SAVEDINSTANCE_POSITION);
             mTrackListEntries = savedInstanceState.getParcelableArrayList(SAVEDINSTANCE_LIST);
+        } else {
+            mTrackListPosition = -1;
         }
     }
 
@@ -82,6 +87,7 @@ public class TrackFragment extends Fragment {
     public void onSaveInstanceState(Bundle outState) {
         outState.putString(SAVEDINSTANCE_TITLE, mTitle);
         outState.putInt(SAVEDINSTANCE_RESULTS, mNofResults);
+        outState.putInt(SAVEDINSTANCE_POSITION, mTrackListPosition);
         outState.putParcelableArrayList(SAVEDINSTANCE_LIST, mTrackListEntries);
 
         super.onSaveInstanceState(outState);
@@ -123,5 +129,13 @@ public class TrackFragment extends Fragment {
 
     public void setTrackListEntries(ArrayList<TrackListEntry> pTrackListEntries) {
         mTrackListEntries = pTrackListEntries;
+    }
+
+    public int getTrackListPosition() {
+        return mTrackListPosition;
+    }
+
+    public void setTrackListPosition(int pTrackListPosition) {
+        mTrackListPosition = pTrackListPosition;
     }
 }

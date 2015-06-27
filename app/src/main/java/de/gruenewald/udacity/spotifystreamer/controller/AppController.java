@@ -295,6 +295,10 @@ public class AppController {
 
     public void registerArtistFragment(ArtistFragment pArtistFragment) {
         mArtistFragment = pArtistFragment;
+
+        if (mArtistFragment != null) {
+            registerArtistListPosition(mArtistFragment.getArtlistPosition());
+        }
     }
 
     public void unregisterArtistFragment() {
@@ -304,6 +308,10 @@ public class AppController {
 
     public void registerTrackFragment(TrackFragment pTrackFragment) {
         mTrackFragment = pTrackFragment;
+
+        if (mTrackFragment != null) {
+            registerTrackListPosition(mTrackFragment.getTrackListPosition());
+        }
     }
 
     public void unregisterTrackFragment() {
