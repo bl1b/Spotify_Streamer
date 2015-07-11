@@ -2,20 +2,20 @@
  * ****************************************************************************
  * Copyright (c) 2015 by Jan Grünewald.
  * jan.gruenewald84@googlemail.com
- * <p/>
+ * <p>
  * This file is part of 'Spotify Streamer'. 'Spotify Streamer' was developed as
  * part of the Android Developer Nanodegree by Udacity.
- * <p/>
+ * <p>
  * 'Spotify Streamer' is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p/>
+ * <p>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p/>
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -23,10 +23,13 @@
 
 package de.gruenewald.udacity.spotifystreamer;
 
-import android.app.Dialog;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.util.Log;
@@ -51,6 +54,7 @@ import de.gruenewald.udacity.spotifystreamer.controller.AppController;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
 import de.gruenewald.udacity.spotifystreamer.model.PlaybackEntry;
 import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
+import de.gruenewald.udacity.spotifystreamer.service.PlaybackService;
 import de.gruenewald.udacity.spotifystreamer.util.StringUtil;
 
 /**
@@ -68,6 +72,24 @@ public class PlaybackFragment extends DialogFragment {
     private ArrayList<PlaybackEntry> mPlaybackEntries;
     private final List<DialogInterface.OnDismissListener> mOnDismissListeners = new ArrayList<DialogInterface.OnDismissListener>();
 
+    private PlaybackService mPlaybackSvc;
+    private Intent mPlaybackIntent;
+    private boolean mBound;
+
+    private ServiceConnection mPlaybackServiceConnection = new ServiceConnection() {
+        @Override public void onServiceConnected(ComponentName name, IBinder service) {
+            PlaybackService.PlaybackBinder myBinder = (PlaybackService.PlaybackBinder) service;
+            mPlaybackSvc = myBinder.getService();
+            mPlaybackSvc.setPlaybackEntries(mPlaybackEntries);
+            mPlaybackSvc.setTrackIndex(mTrackIndex);
+            mBound = true;
+        }
+
+        @Override public void onServiceDisconnected(ComponentName name) {
+            mBound = false;
+        }
+    };
+
     @InjectView(R.id.fragment_playback_text_artist) TextView mArtistTextview;
     @InjectView(R.id.fragment_playback_text_album) TextView mAlbumTextview;
     @InjectView(R.id.fragment_playback_image_cover) ImageView mCoverImageview;
@@ -83,6 +105,28 @@ public class PlaybackFragment extends DialogFragment {
         PlaybackFragment myNewFragment = new PlaybackFragment();
         myNewFragment.setArguments(pDataBundle);
         return myNewFragment;
+    }
+
+    @Override public void onStart() {
+        super.onStart();
+        if (mPlaybackIntent == null) {
+            mPlaybackIntent = new Intent(getActivity(), PlaybackService.class);
+        }
+
+        if (!mBound) {
+            getActivity().bindService(mPlaybackIntent, mPlaybackServiceConnection, Context.BIND_AUTO_CREATE);
+        }
+    }
+
+    @Override public void onDestroy() {
+        super.onDestroy();
+    }
+
+    @Override public void onStop() {
+        if (mPlaybackServiceConnection != null) {
+            getActivity().unbindService(mPlaybackServiceConnection);
+        }
+        super.onStop();
     }
 
     @Nullable @Override
@@ -104,7 +148,8 @@ public class PlaybackFragment extends DialogFragment {
             }
         }
 
-        if(getDialog() != null) {
+        //avoid the title-area by disabling the feature
+        if (getDialog() != null) {
             getDialog().getWindow().requestFeature(Window.FEATURE_NO_TITLE);
         }
 
@@ -128,17 +173,27 @@ public class PlaybackFragment extends DialogFragment {
 
     @OnClick(R.id.fragment_playback_button_prev)
     public void onPrevButtonClick(View pView) {
-        prevTrack();
+        if (mBound && mPlaybackSvc != null) {
+            mPlaybackSvc.prevTrack();
+        }
     }
 
     @OnClick(R.id.fragment_playback_button_play)
     public void onPlayButtonClick(View pView) {
-        playTrack();
+        if (mBound && mPlaybackSvc != null) {
+            if (mPlaybackSvc.isPlaying()) {
+                mPlaybackSvc.pauseTrack();
+            } else {
+                mPlaybackSvc.playTrack();
+            }
+        }
     }
 
     @OnClick(R.id.fragment_playback_button_next)
     public void onNextButtonClick(View pView) {
-        nextTrack();
+        if (mBound && mPlaybackSvc != null) {
+            mPlaybackSvc.nextTrack();
+        }
     }
 
     private void updateViews() {
@@ -174,47 +229,5 @@ public class PlaybackFragment extends DialogFragment {
             }
 
         }
-    }
-
-    public void prevTrack() {
-        mTrackIndex--;
-        if (mTrackIndex < 0) {
-            mTrackIndex = mPlaybackEntries.size() - 1;
-        }
-
-        updateViews();
-    }
-
-    public void playTrack() {
-
-    }
-
-    public void nextTrack() {
-        mTrackIndex++;
-        if (mTrackIndex > mPlaybackEntries.size() - 1) {
-            mTrackIndex = 0;
-        }
-
-        updateViews();
-    }
-
-    public boolean addOnDismissListener(DialogInterface.OnDismissListener pOnDismissListener) {
-        boolean result = false;
-
-        if (mOnDismissListeners != null && !mOnDismissListeners.contains(pOnDismissListener)) {
-            result = mOnDismissListeners.add(pOnDismissListener);
-        }
-
-        return result;
-    }
-
-    public boolean removeOnDismissListener(DialogInterface.OnDismissListener pOnDismissListener) {
-        boolean result = false;
-
-        if (mOnDismissListeners != null && mOnDismissListeners.contains(pOnDismissListener)) {
-            result = mOnDismissListeners.remove(pOnDismissListener);
-        }
-
-        return result;
     }
 }

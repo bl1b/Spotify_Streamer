@@ -35,6 +35,8 @@ public class TrackListEntry implements Parcelable {
     private String mAlbumName;
     private String mAlbumCover;
     private String mAlbumCoverLarge;
+    private String mPreviewUrl;
+    private double mDuration;
 
     public static final Creator<TrackListEntry> CREATOR = new Creator<TrackListEntry>() {
         @Override
@@ -54,6 +56,8 @@ public class TrackListEntry implements Parcelable {
         mAlbumName = null;
         mAlbumCover = null;
         mAlbumCoverLarge = null;
+        mPreviewUrl = null;
+        mDuration = -1;
     }
 
     private TrackListEntry(Parcel in) {
@@ -62,6 +66,8 @@ public class TrackListEntry implements Parcelable {
         mAlbumName = in.readString();
         mAlbumCover = in.readString();
         mAlbumCoverLarge = in.readString();
+        mPreviewUrl = in.readString();
+        mDuration = in.readDouble();
     }
 
     @Override
@@ -76,6 +82,8 @@ public class TrackListEntry implements Parcelable {
         dest.writeString(mAlbumName);
         dest.writeString(mAlbumCover);
         dest.writeString(mAlbumCoverLarge);
+        dest.writeString(mPreviewUrl);
+        dest.writeDouble(mDuration);
     }
 
     @Override public String toString() {
@@ -85,6 +93,8 @@ public class TrackListEntry implements Parcelable {
                 ", mAlbumName='" + mAlbumName + '\'' +
                 ", mAlbumCover='" + mAlbumCover + '\'' +
                 ", mAlbumCoverLarge='" + mAlbumCoverLarge + '\'' +
+                ", mPreviewUrl='" + mPreviewUrl + '\'' +
+                ", mDuration=" + mDuration +
                 '}';
     }
 
@@ -122,5 +132,21 @@ public class TrackListEntry implements Parcelable {
 
     public void setAlbumCoverLarge(String pAlbumCoverLarge) {
         mAlbumCoverLarge = pAlbumCoverLarge;
+    }
+
+    public String getPreviewUrl() {
+        return mPreviewUrl;
+    }
+
+    public void setPreviewUrl(String pPreviewUrl) {
+        mPreviewUrl = pPreviewUrl;
+    }
+
+    public double getDuration() {
+        return mDuration;
+    }
+
+    public void setDuration(double pDuration) {
+        mDuration = pDuration;
     }
 }

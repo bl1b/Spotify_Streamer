@@ -2,20 +2,20 @@
  * ****************************************************************************
  * Copyright (c) 2015 by Jan Grünewald.
  * jan.gruenewald84@googlemail.com
- * <p/>
+ * <p>
  * This file is part of 'Spotify Streamer'. 'Spotify Streamer' was developed as
  * part of the Android Developer Nanodegree by Udacity.
- * <p/>
+ * <p>
  * 'Spotify Streamer' is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
- * <p/>
+ * <p>
  * 'Spotify Streamer' is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * <p/>
+ * <p>
  * You should have received a copy of the GNU General Public License
  * along with 'Spotify Streamer'.  If not, see <http://www.gnu.org/licenses/>.
  * ****************************************************************************
@@ -137,6 +137,9 @@ public class AppController {
                                 myCurrentEntry.setAlbumCover(myTrack.album.images.get(myTrack.album.images.size() - 1).url);
                                 myCurrentEntry.setAlbumCoverLarge(myTrack.album.images.get(0).url);
                             }
+
+                            myCurrentEntry.setPreviewUrl(myTrack.preview_url);
+                            myCurrentEntry.setDuration(myTrack.duration_ms);
                         }
                         myTrackListEntries.add(myCurrentEntry);
                     }
@@ -320,12 +323,6 @@ public class AppController {
     }
 
     public void registerPlaybackFragment(PlaybackFragment pPlaybackFragment) {
-        if (mTrackActivity != null) {
-            pPlaybackFragment.addOnDismissListener(mTrackActivity);
-        } else if (mMainActivity != null) {
-            pPlaybackFragment.addOnDismissListener(mMainActivity);
-        }
-
         mPlaybackFragment = pPlaybackFragment;
     }
 
@@ -355,6 +352,10 @@ public class AppController {
         }
 
         mTrackListPosition = myResult;
+    }
+
+    public int getTrackListPosition() {
+        return mTrackListPosition;
     }
 
     public void unregisterTrackListPosition() {
