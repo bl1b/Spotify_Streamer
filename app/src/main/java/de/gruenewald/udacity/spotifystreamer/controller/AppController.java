@@ -75,7 +75,6 @@ public class AppController {
     private PlaybackFragment mPlaybackFragment;
 
     private int mArtistListPosition;
-    private int mTrackListPosition;
 
     private AppController() {
         Log.v(LOG_TAG, "Creating new instance of AppController.");
@@ -139,7 +138,6 @@ public class AppController {
                             }
 
                             myCurrentEntry.setPreviewUrl(myTrack.preview_url);
-                            myCurrentEntry.setDuration(myTrack.duration_ms);
                         }
                         myTrackListEntries.add(myCurrentEntry);
                     }
@@ -195,10 +193,7 @@ public class AppController {
      * @throws ParameterException         Will be thrown if a provided parameter is invalid.
      */
     public void handleOnTrackSelected(final int pTrackPosition, final boolean pIsTabletMode) throws MissingDependencyException, ParameterException {
-
-        registerTrackListPosition(pTrackPosition);
-
-        if (mTrackListPosition <= -1) {
+        if (pTrackPosition <= -1) {
             throw new ParameterException("Can't execute 'handleOnTrackSelected'. Invalid track's position.");
         }
 
@@ -311,15 +306,10 @@ public class AppController {
 
     public void registerTrackFragment(TrackFragment pTrackFragment) {
         mTrackFragment = pTrackFragment;
-
-        if (mTrackFragment != null) {
-            registerTrackListPosition(mTrackFragment.getTrackListPosition());
-        }
     }
 
     public void unregisterTrackFragment() {
         mTrackFragment = null;
-        unregisterTrackListPosition();
     }
 
     public void registerPlaybackFragment(PlaybackFragment pPlaybackFragment) {
@@ -342,23 +332,5 @@ public class AppController {
 
     public void unregisterArtistListPosition() {
         mArtistListPosition = -1;
-    }
-
-    public void registerTrackListPosition(int pTrackListPosition) {
-        int myResult = -1;
-
-        if (mTrackFragment != null && mTrackFragment.getTrackListEntries() != null && pTrackListPosition >= 0 && mTrackFragment.getTrackListEntries().size() > pTrackListPosition) {
-            myResult = pTrackListPosition;
-        }
-
-        mTrackListPosition = myResult;
-    }
-
-    public int getTrackListPosition() {
-        return mTrackListPosition;
-    }
-
-    public void unregisterTrackListPosition() {
-        mTrackListPosition = -1;
     }
 }

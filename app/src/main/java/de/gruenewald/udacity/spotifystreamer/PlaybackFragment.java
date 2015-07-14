@@ -52,6 +52,7 @@ import butterknife.InjectView;
 import butterknife.OnClick;
 import de.gruenewald.udacity.spotifystreamer.controller.AppController;
 import de.gruenewald.udacity.spotifystreamer.model.ArtistListEntry;
+import de.gruenewald.udacity.spotifystreamer.model.IPlaybackServiceListener;
 import de.gruenewald.udacity.spotifystreamer.model.PlaybackEntry;
 import de.gruenewald.udacity.spotifystreamer.model.TrackListEntry;
 import de.gruenewald.udacity.spotifystreamer.service.PlaybackService;
@@ -60,7 +61,7 @@ import de.gruenewald.udacity.spotifystreamer.util.StringUtil;
 /**
  * Created by Jan on 19.06.2015.
  */
-public class PlaybackFragment extends DialogFragment {
+public class PlaybackFragment extends DialogFragment implements SeekBar.OnSeekBarChangeListener {
 
     static final String LOG_TAG = PlaybackFragment.class.getSimpleName();
 
@@ -70,11 +71,60 @@ public class PlaybackFragment extends DialogFragment {
     private int mTrackIndex;
     private View mRootView;
     private ArrayList<PlaybackEntry> mPlaybackEntries;
-    private final List<DialogInterface.OnDismissListener> mOnDismissListeners = new ArrayList<DialogInterface.OnDismissListener>();
 
     private PlaybackService mPlaybackSvc;
     private Intent mPlaybackIntent;
     private boolean mBound;
+
+    private final IPlaybackServiceListener mPlaybackServiceListener = new IPlaybackServiceListener() {
+
+        @Override
+        public void OnPlaybackChanged(final PlaybackEntry pPlaybackEntry, final int pTrackIndex) {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        updateViews(pPlaybackEntry);
+                    }
+                });
+            }
+            mTrackIndex = pTrackIndex;
+        }
+
+        @Override public void OnPlaybackStarted(final PlaybackEntry pPlaybackEntry) {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        updateViews(pPlaybackEntry);
+                    }
+                });
+            }
+        }
+
+        @Override public void OnPlaybackStopped(final PlaybackEntry pPlaybackEntry) {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        updateViews(pPlaybackEntry);
+                    }
+                });
+            }
+        }
+
+        @Override
+        public void OnPlaybackUpdated(final PlaybackEntry pPlaybackEntry, final int pCurrentPosition, final int pTotalPosition) {
+            if (getActivity() != null) {
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override public void run() {
+                        if (mScrubSeekbar != null) {
+                            mScrubSeekbar.setMax(pTotalPosition);
+                            mScrubSeekbar.setProgress(pCurrentPosition);
+                        }
+                        updateViews(pPlaybackEntry);
+                    }
+                });
+            }
+        }
+    };
 
     private ServiceConnection mPlaybackServiceConnection = new ServiceConnection() {
         @Override public void onServiceConnected(ComponentName name, IBinder service) {
@@ -82,11 +132,14 @@ public class PlaybackFragment extends DialogFragment {
             mPlaybackSvc = myBinder.getService();
             mPlaybackSvc.setPlaybackEntries(mPlaybackEntries);
             mPlaybackSvc.setTrackIndex(mTrackIndex);
+            mPlaybackSvc.addPlaybackServiceListener(mPlaybackServiceListener);
             mBound = true;
         }
 
         @Override public void onServiceDisconnected(ComponentName name) {
             mBound = false;
+            mPlaybackSvc.removePlaybackServiceListener(mPlaybackServiceListener);
+            mPlaybackSvc = null;
         }
     };
 
@@ -123,7 +176,7 @@ public class PlaybackFragment extends DialogFragment {
     }
 
     @Override public void onStop() {
-        if (mPlaybackServiceConnection != null) {
+        if (mPlaybackServiceConnection != null && mBound) {
             getActivity().unbindService(mPlaybackServiceConnection);
         }
         super.onStop();
@@ -137,8 +190,10 @@ public class PlaybackFragment extends DialogFragment {
 
             //repopulate the views with the provided arguments; if no external arguments are
             //found try to use the savedInstanceState
-            Bundle myBundle = getArguments();
-            if (myBundle == null && savedInstanceState != null) {
+            Bundle myBundle = null;
+            if (savedInstanceState != null) {
+                myBundle = savedInstanceState;
+            } else if (getArguments() != null) {
                 myBundle = getArguments();
             }
 
@@ -159,8 +214,9 @@ public class PlaybackFragment extends DialogFragment {
     @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        if (view != null) {
-            updateViews();
+        mScrubSeekbar.setOnSeekBarChangeListener(this);
+        if (view != null && mPlaybackEntries != null && mPlaybackEntries.get(mTrackIndex) != null) {
+            updateViews(mPlaybackEntries.get(mTrackIndex));
         }
     }
 
@@ -169,6 +225,23 @@ public class PlaybackFragment extends DialogFragment {
         outState.putParcelableArrayList(ARG_PLAYBACK_DATALIST, mPlaybackEntries);
 
         super.onSaveInstanceState(outState);
+    }
+
+    private int mLastUserProgress;
+
+    @Override public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+        if (mScrubSeekbar != null && fromUser) {
+            mLastUserProgress = progress;
+        }
+    }
+
+    @Override public void onStartTrackingTouch(SeekBar seekBar) {
+    }
+
+    @Override public void onStopTrackingTouch(SeekBar seekBar) {
+        if (mBound && mPlaybackSvc != null) {
+            mPlaybackSvc.jumpToPosition(mLastUserProgress);
+        }
     }
 
     @OnClick(R.id.fragment_playback_button_prev)
@@ -196,37 +269,30 @@ public class PlaybackFragment extends DialogFragment {
         }
     }
 
-    private void updateViews() {
-        if (mPlaybackEntries != null && mTrackIndex >= 0 && mTrackIndex < mPlaybackEntries.size()) {
+    private void updateViews(PlaybackEntry pPlaybackEntry) {
+        if (pPlaybackEntry != null) {
 
-            AppController.getInstance().registerTrackListPosition(mTrackIndex);
-            PlaybackEntry myEntry = mPlaybackEntries.get(mTrackIndex);
+            ArtistListEntry myArtist = pPlaybackEntry.getArtistListEntry();
+            TrackListEntry myTrack = pPlaybackEntry.getTrackListEntry();
 
-            if (myEntry != null) {
-
-                ArtistListEntry myArtist = myEntry.getArtistListEntry();
-                TrackListEntry myTrack = myEntry.getTrackListEntry();
-
-                if (mArtistTextview != null && myArtist != null && !StringUtil.isEmpty(myArtist.getArtistName())) {
-                    mArtistTextview.setText(myArtist.getArtistName());
-                }
-
-                if (mAlbumTextview != null && myTrack != null && !StringUtil.isEmpty(myTrack.getAlbumName())) {
-                    mAlbumTextview.setText(myTrack.getAlbumName());
-                }
-
-                if (mCoverImageview != null && myTrack != null && !StringUtil.isEmpty(myTrack.getAlbumCoverLarge())) {
-                    Picasso.with(getActivity()).load(myTrack.getAlbumCoverLarge()).into(mCoverImageview);
-                }
-
-                if (mTrackTextview != null && myTrack != null && !StringUtil.isEmpty(myTrack.getTrackName())) {
-                    mTrackTextview.setText(myTrack.getTrackName());
-                }
-            } else {
-
-                Log.w(LOG_TAG, "Entry in Playback-List is null!");
-
+            if (mArtistTextview != null && myArtist != null && !StringUtil.isEmpty(myArtist.getArtistName())) {
+                mArtistTextview.setText(myArtist.getArtistName());
             }
+
+            if (mAlbumTextview != null && myTrack != null && !StringUtil.isEmpty(myTrack.getAlbumName())) {
+                mAlbumTextview.setText(myTrack.getAlbumName());
+            }
+
+            if (mCoverImageview != null && myTrack != null && !StringUtil.isEmpty(myTrack.getAlbumCoverLarge())) {
+                Picasso.with(getActivity()).load(myTrack.getAlbumCoverLarge()).into(mCoverImageview);
+            }
+
+            if (mTrackTextview != null && myTrack != null && !StringUtil.isEmpty(myTrack.getTrackName())) {
+                mTrackTextview.setText(myTrack.getTrackName());
+            }
+        } else {
+
+            Log.w(LOG_TAG, "Entry in Playback-List is null!");
 
         }
     }

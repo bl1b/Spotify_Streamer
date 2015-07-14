@@ -31,7 +31,7 @@ public interface IPlaybackServiceListener {
      *
      * @param pPlaybackEntry The new playback entry.
      */
-    public void OnPlaybackChanged(PlaybackEntry pPlaybackEntry);
+    public void OnPlaybackChanged(final PlaybackEntry pPlaybackEntry, final int pTrackIndex);
 
     /**
      * This callback method will be called when the a track starts playing; either after it was
